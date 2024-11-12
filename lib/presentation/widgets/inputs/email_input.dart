@@ -7,7 +7,11 @@ class EmailTextField extends StatelessWidget {
   const EmailTextField({Key? key, this.controller}) : super(key: key);
 
   String? _emailValidator(String? value) {
-    if (value == null || !value.contains('@')) {
+    final regex = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+
+    if (value == null || !value.isNotEmpty) {
+      return 'Podaj email';
+    } else if (!regex.hasMatch(value)) {
       return 'Podaj poprawny email';
     }
     return null;
@@ -21,15 +25,18 @@ class EmailTextField extends StatelessWidget {
       keyboardType: TextInputType.emailAddress,
       validator: _emailValidator,
       decoration: InputDecoration(
-        prefixIcon: const Icon(Icons.email),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8.0),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8.0),
-          borderSide: BorderSide(color: Colors.blue),
-        ),
-      ),
+          prefixIcon: const Icon(Icons.email),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8.0),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8.0),
+            borderSide: BorderSide(color: Colors.blue),
+          ),
+          errorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8.0),
+            borderSide: BorderSide(color: Colors.red),
+          )),
     );
   }
 }

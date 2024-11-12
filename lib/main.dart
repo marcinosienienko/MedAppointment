@@ -2,15 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:medical_app/presentation/pages/login_page.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Medical Appointments',
-      theme: ThemeData(primarySwatch: Colors.blue),
+      theme: ThemeData(
+        scaffoldBackgroundColor: Colors.white,
+      ),
       home: LoginPage(),
     );
   }
