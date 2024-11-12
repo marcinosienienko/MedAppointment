@@ -7,8 +7,8 @@ class BaseTextField extends StatelessWidget {
   final TextEditingController? controller;
   final String? Function(String?)? validator;
   final TextInputType keyboardType;
-  final InputDecoration? decoration;
   final IconData? prefixIcon;
+  final IconButton? suffixIcon;
 
   const BaseTextField({
     Key? key,
@@ -17,9 +17,9 @@ class BaseTextField extends StatelessWidget {
     this.obscureText = false,
     this.controller,
     this.validator,
-    this.decoration,
-    this.prefixIcon,
     this.keyboardType = TextInputType.text,
+    this.prefixIcon,
+    this.suffixIcon,
   }) : super(key: key);
 
   @override
@@ -28,16 +28,25 @@ class BaseTextField extends StatelessWidget {
       controller: controller,
       obscureText: obscureText,
       keyboardType: keyboardType,
-      decoration: decoration ??
-          InputDecoration(
-            labelText: labelText,
-            hintText: hintText,
-            filled: true,
-            fillColor: Colors.white,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8.0),
-            ),
-          ),
+      decoration: InputDecoration(
+        labelText: labelText,
+        hintText: hintText,
+        prefixIcon: prefixIcon != null ? Icon(prefixIcon) : null,
+        suffixIcon: suffixIcon,
+        filled: true,
+        fillColor: Colors.white,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8.0),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8.0),
+          borderSide: BorderSide(color: Colors.blue),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8.0),
+          borderSide: BorderSide(color: Colors.red),
+        ),
+      ),
       validator: validator,
     );
   }

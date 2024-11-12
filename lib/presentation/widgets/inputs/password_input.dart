@@ -1,0 +1,52 @@
+import 'package:flutter/material.dart';
+import 'base_input.dart';
+
+class PasswordTextField extends StatefulWidget {
+  final TextEditingController? controller;
+
+  const PasswordTextField({Key? key, this.controller}) : super(key: key);
+
+  @override
+  State<PasswordTextField> createState() => _PasswordTextFieldState();
+}
+
+class _PasswordTextFieldState extends State<PasswordTextField> {
+  bool _isObscured = true;
+
+  void _toggleVisibility() {
+    setState(() {
+      _isObscured = !_isObscured;
+    });
+  }
+
+  String? _passwordValidator(String? value) {
+    final regex = RegExp(
+        r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$');
+    if (value == null || value.isEmpty) {
+      return 'Podaj hasło';
+    } else if (!regex.hasMatch(value)) {
+      return 'Hasło musi mieć min. 8 znaków, wielką literę, cyfrę i znak specjalny';
+    }
+    return null;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2.0),
+      child: BaseTextField(
+        hintText: 'Hasło',
+        controller: widget.controller,
+        obscureText: _isObscured,
+        validator: _passwordValidator,
+        prefixIcon: Icons.lock,
+        suffixIcon: IconButton(
+          icon: Icon(
+            _isObscured ? Icons.visibility : Icons.visibility_off,
+          ),
+          onPressed: _toggleVisibility,
+        ),
+      ),
+    );
+  }
+}
