@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:medical_app/presentation/widgets/buttons/PrimaryButton.dart';
 import 'package:medical_app/presentation/widgets/inputs/email_input.dart';
+import 'package:medical_app/presentation/widgets/inputs/password_input.dart';
 
 class LoginPage extends StatelessWidget {
   final TextEditingController _emailController = TextEditingController();
@@ -28,6 +29,8 @@ class LoginPage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   EmailTextField(controller: _emailController),
+                  const SizedBox(height: 16),
+                  PasswordTextField(),
                   const SizedBox(height: 16),
                   PrimaryButton(
                     text: "Zaloguj",
