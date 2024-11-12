@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:medical_app/presentation/widgets/inputs/base_text_field.dart';
+import 'base_input.dart';
 
 class EmailTextField extends StatelessWidget {
   final TextEditingController? controller;
@@ -8,8 +8,7 @@ class EmailTextField extends StatelessWidget {
 
   String? _emailValidator(String? value) {
     final regex = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
-
-    if (value == null || !value.isNotEmpty) {
+    if (value == null || value.isEmpty) {
       return 'Podaj email';
     } else if (!regex.hasMatch(value)) {
       return 'Podaj poprawny email';
@@ -24,20 +23,7 @@ class EmailTextField extends StatelessWidget {
       controller: controller,
       keyboardType: TextInputType.emailAddress,
       validator: _emailValidator,
-      decoration: InputDecoration(
-        prefixIcon: const Icon(Icons.email),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8.0),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8.0),
-          borderSide: BorderSide(color: Colors.blue),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8.0),
-          borderSide: BorderSide(color: Colors.red),
-        ),
-      ),
+      prefixIcon: Icons.email,
     );
   }
 }

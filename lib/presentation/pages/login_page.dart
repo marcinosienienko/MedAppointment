@@ -26,20 +26,23 @@ class LoginPage extends StatelessWidget {
             child: Form(
               key: _formKey,
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   EmailTextField(controller: _emailController),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 8),
                   PasswordTextField(),
-                  const SizedBox(height: 16),
-                  PrimaryButton(
-                    text: "Zaloguj",
-                    onPressed: () {
-                      if (_formKey.currentState!.validate()) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Logowanie...')));
-                      }
-                    },
+                  const SizedBox(height: 8),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 80),
+                    child: PrimaryButton(
+                      text: "Zaloguj",
+                      onPressed: () {
+                        if (_formKey.currentState!.validate()) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Logowanie...')));
+                        }
+                      },
+                    ),
                   )
                 ],
               ),
