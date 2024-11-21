@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:medical_app/presentation/widgets/inputs/base_input.dart';
+import 'package:medical_app/presentation/widgets/inputs/email_input.dart';
+import 'package:medical_app/presentation/widgets/inputs/name_input.dart';
 
 class RegisterPage extends StatelessWidget {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
@@ -22,13 +25,28 @@ class RegisterPage extends StatelessWidget {
         ),
         backgroundColor: Colors.white,
         body: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Container(
-              padding: EdgeInsets.all(16.0),
-              decoration: BoxDecoration(color: Colors.amber),
-            ),
-          ),
-        ));
+            child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  children: [
+                    Form(
+                      key: _formKey,
+                      child: Column(
+                        children: [
+                          NameInput(controller: _firstNameController),
+                          NameInput(controller: _lastNameController),
+                          EmailTextField(controller: _emailController),
+                          ElevatedButton(
+                            onPressed: () {
+                              if (_formKey.currentState!.validate()) {}
+                            },
+                            child: const Text(
+                                'Submit'), // Add a child widget to the ElevatedButton
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ))));
   }
 }
