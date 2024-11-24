@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:medical_app/presentation/widgets/buttons/PrimaryButton.dart';
 import 'package:medical_app/presentation/widgets/inputs/base_input.dart';
 import 'package:medical_app/presentation/widgets/inputs/email_input.dart';
 import 'package:medical_app/presentation/widgets/inputs/name_input.dart';
+import 'package:medical_app/presentation/widgets/inputs/password_input.dart';
 
 class RegisterPage extends StatelessWidget {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
@@ -33,15 +35,45 @@ class RegisterPage extends StatelessWidget {
                       key: _formKey,
                       child: Column(
                         children: [
-                          NameInput(controller: _firstNameController),
-                          NameInput(controller: _lastNameController),
+                          NameInput(
+                            controller: _firstNameController,
+                            hintText: 'Imię',
+                            prefixIcon: Icons.person,
+                            validationType: ValidationType.name,
+                          ),
+                          const SizedBox(height: 16),
+                          NameInput(
+                            controller: _lastNameController,
+                            hintText: 'Nazwisko',
+                            prefixIcon: Icons.person,
+                            validationType: ValidationType.surname,
+                          ),
+                          const SizedBox(height: 16),
                           EmailTextField(controller: _emailController),
-                          ElevatedButton(
+                          const SizedBox(height: 16),
+                          PasswordTextField(
+                              controller: _passwordController,
+                              hintText: 'Hasło'),
+                          const SizedBox(height: 16),
+                          PasswordTextField(
+                            hintText: 'Potwierdź hasło',
+                            controller: _confirmPasswordController,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Potwierdź hasło';
+                              } else if (value != _passwordController.text) {
+                                return 'Hasła nie są takie same';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 16),
+                          PrimaryButton(
                             onPressed: () {
                               if (_formKey.currentState!.validate()) {}
                             },
-                            child: const Text(
-                                'Submit'), // Add a child widget to the ElevatedButton
+                            text: 'Zarejestruj',
+                            // Add a child widget to the ElevatedButton
                           ),
                         ],
                       ),

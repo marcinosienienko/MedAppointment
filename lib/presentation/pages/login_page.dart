@@ -30,7 +30,10 @@ class LoginPage extends StatelessWidget {
                 children: [
                   EmailTextField(controller: _emailController),
                   const SizedBox(height: 8),
-                  PasswordTextField(),
+                  PasswordTextField(
+                    controller: _emailController,
+                    hintText: 'Email',
+                  ),
                   const SizedBox(height: 8),
                   Padding(
                     padding: const EdgeInsets.only(bottom: 80),

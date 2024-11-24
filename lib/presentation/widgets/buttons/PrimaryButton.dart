@@ -7,6 +7,7 @@ class PrimaryButton extends StatelessWidget {
   final Color color;
   final Color textColor;
   final double borderRadius;
+
   final EdgeInsetsGeometry padding;
 
   const PrimaryButton({
@@ -30,7 +31,8 @@ class PrimaryButton extends StatelessWidget {
         padding: padding,
         minimumSize: const Size.fromHeight(56),
         shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(borderRadius)),
+          borderRadius: BorderRadius.circular(borderRadius),
+        ),
       ),
       child: icon != null
           ? Row(
@@ -38,10 +40,22 @@ class PrimaryButton extends StatelessWidget {
               children: [
                 Icon(icon, color: textColor),
                 const SizedBox(width: 8),
-                Text(text)
+                Text(
+                  text,
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: textColor,
+                  ),
+                ),
               ],
             )
-          : Text(text),
+          : Text(
+              text,
+              style: TextStyle(
+                fontSize: 18,
+                color: textColor,
+              ),
+            ),
     );
   }
 }

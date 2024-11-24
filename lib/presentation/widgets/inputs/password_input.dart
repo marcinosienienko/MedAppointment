@@ -3,8 +3,12 @@ import 'base_input.dart';
 
 class PasswordTextField extends StatefulWidget {
   final TextEditingController? controller;
-
-  const PasswordTextField({Key? key, this.controller}) : super(key: key);
+  final String hintText;
+  const PasswordTextField({
+    Key? key,
+    required this.controller,
+    required this.hintText,
+  }) : super(key: key);
 
   @override
   State<PasswordTextField> createState() => _PasswordTextFieldState();
@@ -35,7 +39,7 @@ class _PasswordTextFieldState extends State<PasswordTextField> {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2.0),
       child: BaseTextField(
-        hintText: 'Hasło',
+        hintText: widget.hintText,
         controller: widget.controller,
         obscureText: _isObscured,
         validator: _passwordValidator,
