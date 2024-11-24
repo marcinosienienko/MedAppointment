@@ -3,11 +3,14 @@ import 'base_input.dart';
 
 class PasswordTextField extends StatefulWidget {
   final TextEditingController? controller;
+  final TextEditingController? otherController;
   final String hintText;
+
   const PasswordTextField({
     Key? key,
     required this.controller,
     required this.hintText,
+    this.otherController,
   }) : super(key: key);
 
   @override
@@ -31,6 +34,12 @@ class _PasswordTextFieldState extends State<PasswordTextField> {
     } else if (!regex.hasMatch(value)) {
       return 'Hasło musi mieć min. 8 znaków, wielką literę, cyfrę i znak specjalny';
     }
+    if (widget.otherController != null &&
+        widget.otherController!.text.isNotEmpty &&
+        widget.otherController!.text != value) {
+      return 'Hasła się nie zgadzają';
+    }
+
     return null;
   }
 

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:medical_app/presentation/widgets/buttons/PrimaryButton.dart';
-import 'package:medical_app/presentation/widgets/inputs/base_input.dart';
 import 'package:medical_app/presentation/widgets/inputs/email_input.dart';
 import 'package:medical_app/presentation/widgets/inputs/name_input.dart';
 import 'package:medical_app/presentation/widgets/inputs/password_input.dart';
@@ -58,14 +57,7 @@ class RegisterPage extends StatelessWidget {
                           PasswordTextField(
                             hintText: 'Potwierdź hasło',
                             controller: _confirmPasswordController,
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Potwierdź hasło';
-                              } else if (value != _passwordController.text) {
-                                return 'Hasła nie są takie same';
-                              }
-                              return null;
-                            },
+                            otherController: _passwordController,
                           ),
                           const SizedBox(height: 16),
                           PrimaryButton(
