@@ -16,61 +16,86 @@ class RegisterPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: const Text(
-            'Rejestracja',
-            style: TextStyle(
-                color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20),
-          ),
-          backgroundColor: const Color.fromARGB(255, 35, 166, 184),
-        ),
-        backgroundColor: Colors.white,
-        body: Center(
-            child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  children: [
-                    Form(
-                      key: _formKey,
-                      child: Column(
-                        children: [
-                          NameInput(
-                            controller: _firstNameController,
-                            hintText: 'Imię',
-                            prefixIcon: Icons.person,
-                            validationType: ValidationType.name,
-                          ),
-                          const SizedBox(height: 16),
-                          NameInput(
-                            controller: _lastNameController,
-                            hintText: 'Nazwisko',
-                            prefixIcon: Icons.person,
-                            validationType: ValidationType.surname,
-                          ),
-                          const SizedBox(height: 16),
-                          EmailTextField(controller: _emailController),
-                          const SizedBox(height: 16),
-                          PasswordTextField(
-                              controller: _passwordController,
-                              hintText: 'Hasło'),
-                          const SizedBox(height: 16),
-                          PasswordTextField(
-                            hintText: 'Potwierdź hasło',
-                            controller: _confirmPasswordController,
-                            otherController: _passwordController,
-                          ),
-                          const SizedBox(height: 16),
-                          PrimaryButton(
-                            onPressed: () {
-                              if (_formKey.currentState!.validate()) {}
-                            },
-                            text: 'Zarejestruj',
-                            // Add a child widget to the ElevatedButton
-                          ),
-                        ],
+      backgroundColor: Colors.white,
+      body: Center(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              children: [
+                const Text(
+                  'Rejestracja',
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.blue,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      NameInput(
+                        controller: _firstNameController,
+                        hintText: 'Imię',
+                        prefixIcon: Icons.person,
+                        validationType: ValidationType.name,
                       ),
-                    ),
-                  ],
-                ))));
+                      const SizedBox(height: 16),
+                      NameInput(
+                        controller: _lastNameController,
+                        hintText: 'Nazwisko',
+                        prefixIcon: Icons.person,
+                        validationType: ValidationType.surname,
+                      ),
+                      const SizedBox(height: 16),
+                      EmailTextField(controller: _emailController),
+                      const SizedBox(height: 16),
+                      PasswordTextField(
+                        controller: _passwordController,
+                        hintText: 'Hasło',
+                      ),
+                      const SizedBox(height: 16),
+                      PasswordTextField(
+                        hintText: 'Potwierdź hasło',
+                        controller: _confirmPasswordController,
+                        otherController: _passwordController,
+                        isConfirmation: true,
+                      ),
+                      const SizedBox(height: 24),
+                      PrimaryButton(
+                        onPressed: () {
+                          if (_formKey.currentState!.validate()) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Rejestracja...')),
+                            );
+                            // Logika rejestracji
+                          }
+                        },
+                        text: 'Zarejestruj',
+                      ),
+                      const SizedBox(height: 16),
+                      // Odnośnik do logowania
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(
+                              context); // Wróć do poprzedniego ekranu (LoginPage)
+                        },
+                        child: const Text(
+                          'Masz już konto? Zaloguj się',
+                          style: TextStyle(color: Colors.blue),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }

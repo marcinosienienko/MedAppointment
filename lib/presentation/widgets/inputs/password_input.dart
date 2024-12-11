@@ -5,12 +5,14 @@ class PasswordTextField extends StatefulWidget {
   final TextEditingController? controller;
   final TextEditingController? otherController;
   final String hintText;
+  final bool isConfirmation;
 
   const PasswordTextField({
     Key? key,
     required this.controller,
     required this.hintText,
     this.otherController,
+    this.isConfirmation = false,
   }) : super(key: key);
 
   @override
@@ -27,17 +29,21 @@ class _PasswordTextFieldState extends State<PasswordTextField> {
   }
 
   String? _passwordValidator(String? value) {
-    final regex = RegExp(
-        r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$');
     if (value == null || value.isEmpty) {
       return 'Podaj hasło';
-    } else if (!regex.hasMatch(value)) {
-      return 'Hasło musi mieć min. 8 znaków, wielką literę, cyfrę i znak specjalny';
     }
-    if (widget.otherController != null &&
-        widget.otherController!.text.isNotEmpty &&
-        widget.otherController!.text != value) {
-      return 'Hasła się nie zgadzają';
+    if (!widget.isConfirmation) {
+      final regex = RegExp(
+          r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$');
+      if (!regex.hasMatch(value)) {
+        return 'Hasło musi mieć min. 8 znaków, wielką literę, cyfrę i znak specjalny';
+      }
+    }
+
+    if (widget.isConfirmation && widget.otherController != null) {
+      if (value != widget.otherController!.text) {
+        return 'Hasła się nie zgadzają';
+      }
     }
 
     return null;

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:medical_app/presentation/pages/dashboard_page.dart';
 import 'package:medical_app/presentation/pages/login_page.dart';
+import 'package:medical_app/presentation/pages/profile_page.dart';
 import 'package:medical_app/presentation/pages/register_page.dart';
 
 void main() {
@@ -16,7 +18,14 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         scaffoldBackgroundColor: Colors.white,
       ),
-      home: RegisterPage(),
+      //home: RegisterPage(),
+      initialRoute: '/login',
+      routes: {
+        '/login': (context) => LoginPage(),
+        '/register': (context) => RegisterPage(),
+        '/home': (context) => DashboardPage(),
+        '/profile': (context) => ProfilePage(),
+      },
     );
   }
 }

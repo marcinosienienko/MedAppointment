@@ -5,50 +5,65 @@ import 'package:medical_app/presentation/widgets/inputs/password_input.dart';
 
 class LoginPage extends StatelessWidget {
   final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: const Text(
-            'Logowanie do przychodni',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 20,
+      backgroundColor: Colors.white,
+      body: Center(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              children: [
+                const Text(
+                  'Logowanie',
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.blue,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                Form(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      EmailTextField(controller: _emailController),
+                      const SizedBox(height: 8),
+                      PasswordTextField(
+                        controller: _passwordController,
+                        hintText: 'Hasło',
+                      ),
+                      const SizedBox(height: 16),
+                      PrimaryButton(
+                        text: "Zaloguj",
+                        onPressed: () {
+                          if (_formKey.currentState!.validate()) {
+                            Navigator.pushNamed(context, '/home');
+                          }
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pushNamed(context, '/register');
+                        },
+                        child: const Text(
+                          "Nie masz konta? Zarejestruj się",
+                          style: TextStyle(color: Colors.blue),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
-          backgroundColor: const Color.fromARGB(255, 35, 166, 184),
         ),
-        backgroundColor: Colors.white,
-        body: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  EmailTextField(controller: _emailController),
-                  const SizedBox(height: 8),
-                  PasswordTextField(
-                    controller: _emailController,
-                    hintText: 'Email',
-                  ),
-                  const SizedBox(height: 8),
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 80),
-                    child: PrimaryButton(
-                      text: "Zaloguj",
-                      onPressed: () {
-                        if (_formKey.currentState!.validate()) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Logowanie...')));
-                        }
-                      },
-                    ),
-                  )
-                ],
-              ),
-            )));
+      ),
+    );
   }
 }
