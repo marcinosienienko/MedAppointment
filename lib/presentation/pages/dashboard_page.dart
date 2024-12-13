@@ -14,36 +14,33 @@ class DashboardPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-        automaticallyImplyLeading: false, // Usunięcie przycisku wstecz
+        automaticallyImplyLeading: false,
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            // Powitanie użytkownika
             Expanded(
               child: Text(
                 'Witaj, ${user.name.split(' ')[0]}',
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
-                  fontSize: 24, // Zmniejszenie, by wyglądało estetycznie
+                  fontSize: 24,
                   color: Colors.black,
                 ),
               ),
             ),
-            // Awatar użytkownika
             GestureDetector(
               onTap: () {
-                Navigator.pushNamed(
-                    context, '/profile'); // Przejście do profilu
+                Navigator.pushNamed(context, '/profile');
               },
               child: CircleAvatar(
-                radius: 20, // Promień awatara
+                radius: 20,
                 backgroundColor: Colors.blueGrey,
                 backgroundImage: user.avatarUrl != null
                     ? NetworkImage(user.avatarUrl!)
                     : null,
                 child: user.avatarUrl == null
                     ? Text(
-                        user.name[0], // Pierwsza litera imienia
+                        user.name[0],
                         style: const TextStyle(
                           fontSize: 20,
                           color: Colors.white,

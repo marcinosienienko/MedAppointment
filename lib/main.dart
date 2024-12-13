@@ -1,11 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:medical_app/presentation/pages/dashboard_page.dart';
+import 'package:provider/provider.dart';
+import 'package:medical_app/data/viewmodels/appointments_viewmodel.dart';
+import 'package:medical_app/presentation/pages/appointments_page.dart';
 import 'package:medical_app/presentation/pages/login_page.dart';
 import 'package:medical_app/presentation/pages/profile_page.dart';
 import 'package:medical_app/presentation/pages/register_page.dart';
+import 'package:medical_app/presentation/widgets/navigation_bar.dart';
+import 'package:medical_app/core/theme/app_colors.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => AppointmentsViewModel()),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -16,14 +27,19 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Medical Appointments',
       theme: ThemeData(
-        scaffoldBackgroundColor: Colors.white,
+        useMaterial3: true,
+        primaryColor: AppColors.primary,
+        scaffoldBackgroundColor: AppColors.background,
+        appBarTheme: AppBarTheme(
+          backgroundColor: AppColors.primary,
+          foregroundColor: Colors.white,
+        ),
       ),
-      //home: RegisterPage(),
-      initialRoute: '/login',
+      initialRoute: '/home',
       routes: {
         '/login': (context) => LoginPage(),
         '/register': (context) => RegisterPage(),
-        '/home': (context) => DashboardPage(),
+        '/home': (context) => const BottomNavigation(),
         '/profile': (context) => ProfilePage(),
       },
     );
