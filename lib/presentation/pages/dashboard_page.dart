@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:medical_app/data/models/doctor_model.dart';
 import 'package:medical_app/data/models/user_model.dart';
+import 'package:medical_app/presentation/widgets/inputs/search_input_trash.dart';
 import 'package:medical_app/presentation/widgets/inputs/search_input.dart';
-import 'package:medical_app/presentation/widgets/inputs/search_input2.dart';
 import 'package:provider/provider.dart';
 
 class DashboardPage extends StatelessWidget {
@@ -63,7 +63,7 @@ class DashboardPage extends StatelessWidget {
           children: [
             const SizedBox(height: 16),
             Expanded(
-              child: SearchInput2(),
+              child: SearchInput(),
             )
           ],
         ),
