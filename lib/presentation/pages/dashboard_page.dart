@@ -17,7 +17,7 @@ class DashboardPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.lightBlue,
         automaticallyImplyLeading: false,
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -57,7 +57,7 @@ class DashboardPage extends StatelessWidget {
         ),
       ),
       body: Container(
-        color: Colors.lightBlueAccent,
+        color: Colors.blue[50],
         padding: const EdgeInsets.all(8),
         child: Column(
           children: [
