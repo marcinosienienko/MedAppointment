@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:medical_app/data/models/doctor_model.dart';
+import 'package:medical_app/data/viewmodels/doctor_viewmodel.dart';
 import 'package:provider/provider.dart';
 import 'package:medical_app/data/viewmodels/appointments_viewmodel.dart';
-import 'package:medical_app/presentation/pages/appointments_page.dart';
 import 'package:medical_app/presentation/pages/login_page.dart';
 import 'package:medical_app/presentation/pages/profile_page.dart';
 import 'package:medical_app/presentation/pages/register_page.dart';
@@ -13,6 +14,7 @@ void main() {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => AppointmentsViewModel()),
+        ChangeNotifierProvider(create: (_) => DoctorsViewModel()),
       ],
       child: const MyApp(),
     ),

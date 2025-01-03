@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:medical_app/data/models/doctor_model.dart';
 import 'package:medical_app/data/models/user_model.dart';
+import 'package:medical_app/presentation/widgets/inputs/search_input.dart';
+import 'package:medical_app/presentation/widgets/inputs/search_input2.dart';
+import 'package:provider/provider.dart';
 
 class DashboardPage extends StatelessWidget {
   const DashboardPage({super.key});
@@ -13,7 +17,7 @@ class DashboardPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: Colors.white,
         automaticallyImplyLeading: false,
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -52,8 +56,17 @@ class DashboardPage extends StatelessWidget {
           ],
         ),
       ),
-      body: const Center(
-        child: Text('Dashboard Content Goes Here'),
+      body: Container(
+        color: Colors.lightBlueAccent,
+        padding: const EdgeInsets.all(8),
+        child: Column(
+          children: [
+            const SizedBox(height: 16),
+            Expanded(
+              child: SearchInput2(),
+            )
+          ],
+        ),
       ),
     );
   }
