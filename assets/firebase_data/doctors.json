@@ -1,0 +1,98 @@
+[
+  {
+    "id": "doctor_001",
+    "name": "Jan Kowalski",
+    "specialization": "Lekarz rodzinny",
+    "pwzNumber": "123456",
+    "description": "Doświadczony lekarz rodzinny z ponad 20-letnim stażem.",
+    "avatarUrl": "https://example.com/avatar1.jpg"
+  },
+  {
+    "id": "doctor_002",
+    "name": "Anna Nowak",
+    "specialization": "Lekarz rodzinny",
+    "pwzNumber": "654321",
+    "description": "Lekarz rodzinny z pasją do pomagania pacjentom.",
+    "avatarUrl": "https://example.com/avatar2.jpg"
+  },
+  {
+    "id": "doctor_003",
+    "name": "Adam Zając",
+    "specialization": "Okulista",
+    "pwzNumber": "987654",
+    "description": "Specjalista w diagnostyce i leczeniu chorób oczu.",
+    "avatarUrl": "https://example.com/avatar9.jpg"
+  },
+  {
+    "id": "doctor_004",
+    "name": "Ewa Lis",
+    "specialization": "Okulista",
+    "pwzNumber": "876543",
+    "description": "Ekspert w leczeniu jaskry i zaćmy.",
+    "avatarUrl": "https://example.com/avatar10.jpg"
+  },
+  {
+    "id": "doctor_005",
+    "name": "Tomasz Zieliński",
+    "specialization": "Lekarz ogólny",
+    "pwzNumber": "112233",
+    "description": "Lekarz ogólny, specjalizujący się w diagnozowaniu chorób przewlekłych.",
+    "avatarUrl": "https://example.com/avatar11.jpg"
+  },
+  {
+    "id": "doctor_006",
+    "name": "Magdalena Wiśniewska",
+    "specialization": "Lekarz ogólny",
+    "pwzNumber": "223344",
+    "description": "Pomocna w prowadzeniu terapii dla pacjentów z chorobami przewlekłymi.",
+    "avatarUrl": "https://example.com/avatar12.jpg"
+  },
+  {
+    "id": "doctor_007",
+    "name": "Marek Wróbel",
+    "specialization": "Urolog",
+    "pwzNumber": "334455",
+    "description": "Urolog specjalizujący się w leczeniu chorób układu moczowego.",
+    "avatarUrl": "https://example.com/avatar13.jpg"
+  },
+  {
+    "id": "doctor_008",
+    "name": "Katarzyna Kwiatkowska",
+    "specialization": "Urolog",
+    "pwzNumber": "445566",
+    "description": "Ekspert w leczeniu kamicy nerkowej i infekcji układu moczowego.",
+    "avatarUrl": "https://example.com/avatar14.jpg"
+  },
+  {
+    "id": "doctor_009",
+    "name": "Rafał Dąbrowski",
+    "specialization": "Onkolog",
+    "pwzNumber": "556677",
+    "description": "Specjalista w leczeniu nowotworów złośliwych.",
+    "avatarUrl": "https://example.com/avatar15.jpg"
+  },
+  {
+    "id": "doctor_010",
+    "name": "Ewelina Woźniak",
+    "specialization": "Onkolog",
+    "pwzNumber": "667788",
+    "description": "Doświadczona w prowadzeniu terapii nowotworów piersi i płuc.",
+    "avatarUrl": "https://example.com/avatar16.jpg"
+  },
+  {
+    "id": "doctor_011",
+    "name": "Dorota Stępień",
+    "specialization": "Ginekolog",
+    "pwzNumber": "778899",
+    "description": "Specjalista w prowadzeniu ciąży oraz diagnostyce chorób kobiecych.",
+    "avatarUrl": "https://example.com/avatar17.jpg"
+  },
+  {
+    "id": "doctor_012",
+    "name": "Piotr Grabowski",
+    "specialization": "Chirurg",
+    "pwzNumber": "889900",
+    "description": "Specjalista chirurg, wykonujący operacje ogólne i urazowe.",
+    "avatarUrl": "https://example.com/avatar18.jpg"
+  }
+]

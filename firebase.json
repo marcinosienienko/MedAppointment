@@ -1,0 +1,48 @@
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "przychodnia-6e705",
+          "appId": "1:344336366758:android:6f506648bb1a69055f4867",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "ios": {
+        "default": {
+          "projectId": "przychodnia-6e705",
+          "appId": "1:344336366758:ios:c017443efc82492b5f4867",
+          "uploadDebugSymbols": false,
+          "fileOutput": "ios/Runner/GoogleService-Info.plist"
+        }
+      },
+      "macos": {
+        "default": {
+          "projectId": "przychodnia-6e705",
+          "appId": "1:344336366758:ios:c017443efc82492b5f4867",
+          "uploadDebugSymbols": false,
+          "fileOutput": "macos/Runner/GoogleService-Info.plist"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "przychodnia-6e705",
+          "configurations": {
+            "android": "1:344336366758:android:6f506648bb1a69055f4867",
+            "ios": "1:344336366758:ios:c017443efc82492b5f4867",
+            "macos": "1:344336366758:ios:c017443efc82492b5f4867",
+            "web": "1:344336366758:web:e6814e81b7857e945f4867",
+            "windows": "1:344336366758:web:d07810421ae751b35f4867"
+          }
+        }
+      }
+    }
+  },
+  "firestore": {
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  },
+  "storage": {
+    "rules": "storage.rules"
+  }
+}

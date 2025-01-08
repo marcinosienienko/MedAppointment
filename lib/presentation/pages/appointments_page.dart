@@ -22,7 +22,7 @@ class AppointmentsPage extends StatelessWidget {
               FilterChoiceChip(
                 label: 'Nadchodzące',
                 selected: true,
-                count: viewModel.upcomingAppointments.length,
+                // count: viewModel.upcomingAppointments.length,
                 onSelected: (bool selected) {
                   // Logika zmiany stanu
                 },
@@ -30,7 +30,7 @@ class AppointmentsPage extends StatelessWidget {
               FilterChoiceChip(
                 label: 'Zakończone',
                 selected: false,
-                count: viewModel.completedAppointments.length,
+                //   count: viewModel.completedAppointments.length,
                 onSelected: (bool selected) {
                   // Logika zmiany stanu
                 },
@@ -38,7 +38,7 @@ class AppointmentsPage extends StatelessWidget {
               FilterChoiceChip(
                 label: 'Odwołane',
                 selected: false,
-                count: viewModel.cancelledAppointments.length,
+                //count: viewModel.cancelledAppointments.length,
                 onSelected: (bool selected) {
                   // Logika zmiany stanu
                 },

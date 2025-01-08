@@ -27,7 +27,7 @@ class SearchResults extends StatelessWidget {
             final doctor = doctors[index];
             return ListTile(
               title: Text(doctor.name),
-              subtitle: Text(doctor.category),
+              subtitle: Text(doctor.specialization),
               onTap: () => onDoctorTap(doctor),
             );
           },

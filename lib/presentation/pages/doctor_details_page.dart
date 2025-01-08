@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:medical_app/data/models/appointment_model.dart';
 import 'package:medical_app/data/models/doctor_model.dart';
+import 'package:medical_app/presentation/pages/appointment.dart';
+import 'package:medical_app/presentation/widgets/buttons/PrimaryButton.dart';
 
 class DoctorDetailsPage extends StatelessWidget {
   final Doctor doctor;
@@ -22,13 +25,17 @@ class DoctorDetailsPage extends StatelessWidget {
             Center(
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(100),
-                child: Image.network(
-                  doctor.avatarUrl ??
-                      'https://via.placeholder.com/150', // Domyślne zdjęcie
-                  width: 150,
-                  height: 150,
-                  fit: BoxFit.cover,
-                ),
+                child: doctor.avatarUrl != null //hasAvatar
+                    ? Image.network(
+                        doctor.avatarUrl!,
+                        width: 150,
+                        height: 150,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return _defaultAvatar();
+                        },
+                      )
+                    : _defaultAvatar(),
               ),
             ),
             const SizedBox(height: 16),
@@ -43,7 +50,7 @@ class DoctorDetailsPage extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              'Specjalizacja: ${doctor.category}',
+              'Specjalizacja: ${doctor.specialization}',
               style: const TextStyle(fontSize: 18),
             ),
             const SizedBox(height: 16),
@@ -62,25 +69,27 @@ class DoctorDetailsPage extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              doctor.description ?? 'Brak opisu dostępnego.',
+              doctor.description ?? 'Brak informacji',
               style: const TextStyle(fontSize: 16),
             ),
             const Spacer(),
 
             // Przycisk "Umów wizytę"
-            Center(
-              child: ElevatedButton(
-                onPressed: () {
-                  // Logika dla umawiania wizyty
-                  Navigator.pushNamed(context, '/appointments',
-                      arguments: doctor);
-                },
-                style: ElevatedButton.styleFrom(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
-                  textStyle: const TextStyle(fontSize: 18),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 30.0),
+              child: Center(
+                child: PrimaryButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            AppointmentBookingPage(doctorId: doctor.id),
+                      ),
+                    );
+                  },
+                  text: 'Umów wizytę',
                 ),
-                child: const Text('Umów wizytę'),
               ),
             ),
           ],
@@ -88,4 +97,13 @@ class DoctorDetailsPage extends StatelessWidget {
       ),
     );
   }
+}
+
+Widget _defaultAvatar() {
+  return Container(
+    width: 150,
+    height: 150,
+    decoration: BoxDecoration(color: Colors.grey[300], shape: BoxShape.circle),
+    child: Icon(Icons.person, size: 80, color: Colors.grey[600]),
+  );
 }
