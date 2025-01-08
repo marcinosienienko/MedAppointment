@@ -1,15 +1,13 @@
-class AppointmentModel {
-  final String id;
-  final String status;
-  final DateTime date;
-  final String doctorName;
-  final String specializationName;
+class Appointment {
+  final String doctorId;
+  final String userId; // Identyfikator użytkownika
+  final DateTime date; // Data i godzina wizyty
+  final bool isConfirmed;
 
-  AppointmentModel({
-    required this.id,
-    required this.status,
+  Appointment({
+    required this.doctorId,
+    required this.userId,
     required this.date,
-    required this.doctorName,
-    required this.specializationName,
+    this.isConfirmed = false, // Domyślnie wizyta jest niepotwierdzona
   });
 }

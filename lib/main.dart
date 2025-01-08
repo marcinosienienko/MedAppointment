@@ -1,6 +1,7 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:medical_app/data/models/doctor_model.dart';
 import 'package:medical_app/data/viewmodels/doctor_viewmodel.dart';
+import 'package:medical_app/firebase_options.dart';
 import 'package:provider/provider.dart';
 import 'package:medical_app/data/viewmodels/appointments_viewmodel.dart';
 import 'package:medical_app/presentation/pages/login_page.dart';
@@ -9,7 +10,12 @@ import 'package:medical_app/presentation/pages/register_page.dart';
 import 'package:medical_app/presentation/widgets/navigation_bar.dart';
 import 'package:medical_app/core/theme/app_colors.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
   runApp(
     MultiProvider(
       providers: [
@@ -43,6 +49,7 @@ class MyApp extends StatelessWidget {
         '/register': (context) => RegisterPage(),
         '/home': (context) => const BottomNavigation(),
         '/profile': (context) => ProfilePage(),
+        //'/test-page': (context) => TestFirestorePage()
       },
     );
   }

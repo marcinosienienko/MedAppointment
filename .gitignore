@@ -1,3 +1,10 @@
+# Firebase keys
+android/app/google-services.json
+ios/Runner/GoogleService-Info.plist
+
+#Exclude Firebase API KEY file
+przychodnia-6e705-firebase-adminsdk-hx5nb-55544b6b7f.json
+
 # Miscellaneous
 *.class
 *.log
