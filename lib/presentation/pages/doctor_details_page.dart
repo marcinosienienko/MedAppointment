@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:medical_app/data/models/appointment_model.dart';
 import 'package:medical_app/data/models/doctor_model.dart';
 import 'package:medical_app/presentation/pages/appointment.dart';
+import 'package:medical_app/presentation/pages/calendar_page.dart';
 import 'package:medical_app/presentation/widgets/buttons/PrimaryButton.dart';
 
 class DoctorDetailsPage extends StatelessWidget {
@@ -83,8 +84,9 @@ class DoctorDetailsPage extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) =>
-                            AppointmentBookingPage(doctorId: doctor.id),
+                        builder: (context) => CalendarPage(
+                          doctorId: doctor.id,
+                        ),
                       ),
                     );
                   },
