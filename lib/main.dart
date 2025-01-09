@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:medical_app/data/viewmodels/doctor_viewmodel.dart';
+import 'package:medical_app/data/viewmodels/slot_viewmodel.dart';
 import 'package:medical_app/firebase_options.dart';
 import 'package:provider/provider.dart';
 import 'package:medical_app/data/viewmodels/appointments_viewmodel.dart';
@@ -21,6 +22,7 @@ void main() async {
       providers: [
         ChangeNotifierProvider(create: (_) => AppointmentsViewModel()),
         ChangeNotifierProvider(create: (_) => DoctorsViewModel()),
+        ChangeNotifierProvider(create: (_) => SlotViewModel()),
       ],
       child: const MyApp(),
     ),
