@@ -16,7 +16,7 @@ class _BottomNavigationState extends State<BottomNavigation> {
 
   final List<Widget> _pages = [
     const DashboardPage(),
-    const AppointmentsPage(),
+    AppointmentsPage(),
     const SettingsPage(),
   ];
 

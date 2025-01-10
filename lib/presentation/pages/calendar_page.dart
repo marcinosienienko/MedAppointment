@@ -3,6 +3,11 @@ import 'package:medical_app/data/viewmodels/slot_viewmodel.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:medical_app/presentation/widgets/buttons/PrimaryButton.dart';
+import 'package:medical_app/data/viewmodels/appointments_viewmodel.dart';
+import 'package:medical_app/data/models/appointment_model.dart';
+import 'package:medical_app/data/viewmodels/doctor_viewmodel.dart';
+import 'package:medical_app/presentation/pages/appointments_page.dart';
+import 'package:medical_app/data/models/slot_model.dart';
 
 class CalendarPage extends StatefulWidget {
   final String doctorId;
@@ -26,7 +31,9 @@ class _CalendarPageState extends State<CalendarPage> {
   @override
   Widget build(BuildContext context) {
     final slotViewModel = Provider.of<SlotViewModel>(context);
-
+    final doctorViewModel = Provider.of<DoctorsViewModel>(context);
+    final appointmentsViewModel =
+        Provider.of<AppointmentsViewModel>(context, listen: false);
     return Scaffold(
       appBar: AppBar(
         title: Text('Kalendarz wizyt'),
@@ -71,13 +78,17 @@ class _CalendarPageState extends State<CalendarPage> {
                     decoration: BoxDecoration(
                       color: isSelected
                           ? Colors.blue
-                          : (slot.isAvailable ? Colors.blueGrey : Colors.red),
+                          : (slot.isAvailable
+                              ? Colors.grey[400]
+                              : Colors.red[200]),
                       borderRadius: BorderRadius.circular(8.0),
                     ),
                     alignment: Alignment.center,
                     child: Text(
                       '${slot.dateTime.hour.toString().padLeft(2, '0')}:${slot.dateTime.minute.toString().padLeft(2, '0')}',
-                      style: TextStyle(color: Colors.white),
+                      style: TextStyle(
+                        color: isSelected ? Colors.white : Colors.grey[700],
+                      ),
                     ),
                   ),
                 );
@@ -91,13 +102,34 @@ class _CalendarPageState extends State<CalendarPage> {
               text: 'Zarezerwuj wizytę',
               onPressed: () {
                 if (slotViewModel.selectedSlot != null) {
-                  slotViewModel.reserveSlot(slotViewModel.selectedSlot!.id);
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text('Wizyta zarezerwowana'),
-                  ));
+                  _showAppointmentConfirmation(
+                      context, slotViewModel.selectedSlot!, () {
+                    appointmentsViewModel.addAppointment(Appointment(
+                      id: slotViewModel.selectedSlot!.id,
+                      doctorName:
+                          doctorViewModel.getDoctorById(widget.doctorId)!.name,
+                      specialization: doctorViewModel
+                          .getDoctorById(widget.doctorId)!
+                          .specialization,
+                      dateTime: slotViewModel.selectedSlot!.dateTime,
+                    ));
+                    slotViewModel.reserveSlot(slotViewModel.selectedSlot!.id);
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      content: Text('Wizyta zarezerwowana'),
+                      duration: Duration(milliseconds: 1000),
+                    ));
+                    Navigator.of(context).pop();
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => AppointmentsPage(),
+                      ),
+                    );
+                  });
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                     content: Text('Wybierz termin wizyty'),
+                    duration: Duration(milliseconds: 1000),
                   ));
                 }
               },
@@ -107,4 +139,30 @@ class _CalendarPageState extends State<CalendarPage> {
       ),
     );
   }
+}
+
+void _showAppointmentConfirmation(
+    BuildContext context, Slot slot, VoidCallback onConfirm) {
+  showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: Text('Czy na pewno chcesz zarezerwować wizytę?'),
+      content: Text(
+          'W dniu ${slot.dateTime.day}.${slot.dateTime.month}.${slot.dateTime.year} o ${slot.dateTime.hour}:${slot.dateTime.minute}'),
+      actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          child: Text('Anuluj'),
+        ),
+        TextButton(
+          onPressed: () {
+            onConfirm();
+          },
+          child: Text('Zarezerwuj'),
+        ),
+      ],
+    ),
+  );
 }
