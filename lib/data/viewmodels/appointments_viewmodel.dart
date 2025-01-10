@@ -6,14 +6,13 @@ class AppointmentsViewModel extends ChangeNotifier {
 
   List<Appointment> get appointments => _appointments;
 
-  // Dodanie nowej wizyty
   void addAppointment(Appointment appointment) {
     _appointments.add(appointment);
     notifyListeners();
   }
 
-  // Pobieranie wizyt dla użytkownika
-  List<Appointment> getAppointmentsForUser(String userId) {
-    return _appointments.where((appt) => appt.userId == userId).toList();
+  void cancelAppointment(String appointmentId) {
+    _appointments.removeWhere((appointment) => appointment.id == appointmentId);
+    notifyListeners();
   }
 }

@@ -46,6 +46,11 @@ class DoctorsViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  Doctor? getDoctorById(String doctorId) {
+    return _allDoctors.firstWhere(
+      (doctor) => doctor.id == doctorId,
+    );
+  }
   // void _fetchDoctors() {
   //   _allDoctors.addAll([
   //     Doctor(
