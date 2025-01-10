@@ -10,12 +10,14 @@ import 'package:medical_app/presentation/pages/profile_page.dart';
 import 'package:medical_app/presentation/pages/register_page.dart';
 import 'package:medical_app/presentation/widgets/navigation_bar.dart';
 import 'package:medical_app/core/theme/app_colors.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  await initializeDateFormatting('pl_PL', null);
 
   runApp(
     MultiProvider(
