@@ -2,11 +2,26 @@ import 'package:flutter/material.dart';
 import 'package:medical_app/data/viewmodels/slot_viewmodel.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:medical_app/presentation/widgets/buttons/PrimaryButton.dart';
 
-class CalendarPage extends StatelessWidget {
+class CalendarPage extends StatefulWidget {
   final String doctorId;
 
   CalendarPage({required this.doctorId});
+
+  @override
+  _CalendarPageState createState() => _CalendarPageState();
+}
+
+class _CalendarPageState extends State<CalendarPage> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final slotViewModel = Provider.of<SlotViewModel>(context, listen: false);
+      slotViewModel.setCurrentDoctorId(widget.doctorId);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,6 +34,7 @@ class CalendarPage extends StatelessWidget {
       body: Column(
         children: [
           TableCalendar(
+            locale: "pl_PL",
             firstDay: DateTime.now(),
             lastDay: DateTime.now().add(Duration(days: 30)),
             focusedDay: slotViewModel.focusedDay,
@@ -28,7 +44,9 @@ class CalendarPage extends StatelessWidget {
               slotViewModel.onDaySelected(selectedDay, focusedDay);
             },
             calendarFormat: CalendarFormat.month,
-            headerStyle: HeaderStyle(formatButtonVisible: true),
+            rowHeight: 40,
+            headerStyle:
+                HeaderStyle(titleCentered: true, formatButtonVisible: false),
           ),
           Expanded(
             child: GridView.builder(
@@ -42,13 +60,13 @@ class CalendarPage extends StatelessWidget {
               itemBuilder: (context, index) {
                 final slot = slotViewModel.slots[index];
                 final isSelected = slotViewModel.selectedSlot == slot;
-
                 return GestureDetector(
-                  onTap: () {
-                    if (slot.isAvailable) {
-                      slotViewModel.selectSlot(slot);
-                    }
-                  },
+                  onTap: slot.isAvailable
+                      ? () {
+                          print('Slot clicked: ${slot.id}');
+                          slotViewModel.selectSlot(slot);
+                        }
+                      : null,
                   child: Container(
                     decoration: BoxDecoration(
                       color: isSelected
@@ -63,6 +81,25 @@ class CalendarPage extends StatelessWidget {
                     ),
                   ),
                 );
+              },
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(
+                bottom: 84.0, top: 8.0, left: 16.0, right: 16.0),
+            child: PrimaryButton(
+              text: 'Zarezerwuj wizytę',
+              onPressed: () {
+                if (slotViewModel.selectedSlot != null) {
+                  slotViewModel.reserveSlot(slotViewModel.selectedSlot!.id);
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text('Wizyta zarezerwowana'),
+                  ));
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text('Wybierz termin wizyty'),
+                  ));
+                }
               },
             ),
           ),
