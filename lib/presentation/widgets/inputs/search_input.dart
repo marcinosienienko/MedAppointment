@@ -27,6 +27,7 @@ class _SearchInput2State extends State<SearchInput> {
         _clearSearch(doctorsViewModel);
       },
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           MainSearchBar(
             searchController: _searchController,
@@ -42,6 +43,7 @@ class _SearchInput2State extends State<SearchInput> {
           if (_currentText.isNotEmpty &&
               doctorsViewModel.filteredDoctors.isNotEmpty)
             Flexible(
+              fit: FlexFit.loose,
               child: SearchResults(
                 doctors: doctorsViewModel.filteredDoctors,
                 onDoctorTap: (doctor) {
