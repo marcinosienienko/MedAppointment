@@ -12,9 +12,11 @@ przychodnia-6e705-firebase-adminsdk-hx5nb-55544b6b7f.json
 *.swp
 .DS_Store
 .atom/
+.build/
 .buildlog/
 .history
 .svn/
+.swiftpm/
 migrate_working_dir/
 
 # IntelliJ related
