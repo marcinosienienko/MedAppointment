@@ -103,29 +103,35 @@ class _CalendarPageState extends State<CalendarPage> {
               onPressed: () {
                 if (slotViewModel.selectedSlot != null) {
                   _showAppointmentConfirmation(
-                      context, slotViewModel.selectedSlot!, () {
-                    appointmentsViewModel.addAppointment(Appointment(
-                      id: slotViewModel.selectedSlot!.id,
-                      doctorName:
-                          doctorViewModel.getDoctorById(widget.doctorId)!.name,
-                      specialization: doctorViewModel
-                          .getDoctorById(widget.doctorId)!
-                          .specialization,
-                      dateTime: slotViewModel.selectedSlot!.dateTime,
-                    ));
-                    slotViewModel.reserveSlot(slotViewModel.selectedSlot!.id);
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                      content: Text('Wizyta zarezerwowana'),
-                      duration: Duration(milliseconds: 1000),
-                    ));
-                    Navigator.of(context).pop();
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => AppointmentsPage(),
-                      ),
-                    );
-                  });
+                    context,
+                    slotViewModel.selectedSlot!,
+                    () {
+                      appointmentsViewModel.addAppointment(Appointment(
+                        id: slotViewModel.selectedSlot!.id,
+                        slotId: slotViewModel.selectedSlot!.id,
+                        doctorId: widget.doctorId,
+                        doctorName: doctorViewModel
+                            .getDoctorById(widget.doctorId)!
+                            .name,
+                        specialization: doctorViewModel
+                            .getDoctorById(widget.doctorId)!
+                            .specialization,
+                        dateTime: slotViewModel.selectedSlot!.dateTime,
+                      ));
+                      slotViewModel.reserveSlot(slotViewModel.selectedSlot!.id);
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        content: Text('Wizyta zarezerwowana'),
+                        duration: Duration(milliseconds: 1000),
+                      ));
+                      Navigator.of(context).pop();
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => AppointmentsPage(),
+                        ),
+                      );
+                    },
+                  );
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                     content: Text('Wybierz termin wizyty'),

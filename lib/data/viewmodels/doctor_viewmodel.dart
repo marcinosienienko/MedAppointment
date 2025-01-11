@@ -49,6 +49,7 @@ class DoctorsViewModel extends ChangeNotifier {
   Doctor? getDoctorById(String doctorId) {
     return _allDoctors.firstWhere(
       (doctor) => doctor.id == doctorId,
+      orElse: () => throw Exception('Doctor not found'),
     );
   }
   // void _fetchDoctors() {
