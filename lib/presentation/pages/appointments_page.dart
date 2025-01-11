@@ -21,35 +21,39 @@ class AppointmentsPage extends StatelessWidget {
               itemCount: appointmentsViewModel.appointments.length,
               itemBuilder: (context, index) {
                 final appointment = appointmentsViewModel.appointments[index];
-                return Card(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12.0),
-                  ),
-                  elevation: 3,
-                  margin: EdgeInsets.symmetric(vertical: 8.0),
-                  child: ListTile(
-                    title: Text(appointment.doctorName,
-                        style: TextStyle(fontWeight: FontWeight.bold)),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('Specjalizacja: ${appointment.specialization}'),
-                        Text(
-                          'Termin: ${appointment.dateTime.toLocal()}',
-                          style: TextStyle(color: Colors.grey),
-                        ),
-                      ],
-                    ),
-                    trailing: IconButton(
-                      icon: Icon(Icons.cancel, color: Colors.red),
-                      onPressed: () {
-                        _showCancelDialog(context, appointment.id);
-                      },
-                    ),
-                  ),
-                );
+                return AppointmentCard(appointment, context);
               },
             ),
+    );
+  }
+
+  AppointmentCard(Appointment appointment, BuildContext context) {
+    return Card(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12.0),
+      ),
+      elevation: 3,
+      margin: EdgeInsets.symmetric(vertical: 8.0),
+      child: ListTile(
+        title: Text(appointment.doctorName,
+            style: TextStyle(fontWeight: FontWeight.bold)),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Specjalizacja: ${appointment.specialization}'),
+            Text(
+              'Termin: ${appointment.dateTime.toLocal()}',
+              style: TextStyle(color: Colors.grey),
+            ),
+          ],
+        ),
+        trailing: IconButton(
+          icon: Icon(Icons.cancel, color: Colors.red),
+          onPressed: () {
+            _showCancelDialog(context, appointment.id);
+          },
+        ),
+      ),
     );
   }
 
