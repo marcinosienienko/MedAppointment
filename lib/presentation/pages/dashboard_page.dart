@@ -14,8 +14,11 @@ class DashboardPage extends StatelessWidget {
     final appointmentsViewModel = Provider.of<AppointmentsViewModel>(context);
 
     final user = UserModel(
-      name: 'Jan Kowalski',
-      avatarUrl: null,
+      id: '1',
+      email: 'jan.kowalski@example.com',
+      firstName: 'Jan',
+      lastName: 'Kowalski',
+      phoneNumber: '1234567890',
     );
 
     return Scaffold(
@@ -27,7 +30,7 @@ class DashboardPage extends StatelessWidget {
           children: [
             Expanded(
               child: Text(
-                'Witaj, ${user.name.split(' ')[0]}',
+                'Witaj, ${user.firstName} ${user.lastName}',
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 24,
@@ -47,7 +50,7 @@ class DashboardPage extends StatelessWidget {
                     : null,
                 child: user.avatarUrl == null
                     ? Text(
-                        user.name[0],
+                        '${user.firstName[0]}${user.lastName[0]}',
                         style: const TextStyle(
                           fontSize: 20,
                           color: Colors.white,

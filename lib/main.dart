@@ -11,6 +11,8 @@ import 'package:medical_app/presentation/pages/register_page.dart';
 import 'package:medical_app/presentation/widgets/navigation_bar.dart';
 import 'package:medical_app/core/theme/app_colors.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:medical_app/data/viewmodels/register_page_viewmodel.dart';
+import 'package:medical_app/data/viewmodels/login_page_viewmodel.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -29,6 +31,8 @@ void main() async {
           ),
         ),
         ChangeNotifierProvider(create: (_) => DoctorsViewModel()),
+        ChangeNotifierProvider(create: (_) => RegisterViewModel()),
+        ChangeNotifierProvider(create: (_) => LoginViewModel()),
       ],
       child: const MyApp(),
     ),

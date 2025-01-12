@@ -11,6 +11,7 @@ class NameInput extends StatelessWidget {
   final String hintText;
   final ValidationType validationType;
   final IconData prefixIcon;
+  final Function(String)? onChanged;
 
   NameInput({
     Key? key,
@@ -18,6 +19,7 @@ class NameInput extends StatelessWidget {
     required this.hintText,
     required this.validationType,
     required this.prefixIcon,
+    this.onChanged,
   }) : super(key: key);
 
   final RegExp containNumberRegex =

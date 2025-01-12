@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class BaseTextField extends StatelessWidget {
   final String? labelText;
@@ -12,6 +13,7 @@ class BaseTextField extends StatelessWidget {
   final Color? fillColor;
   final Function(String)? onChanged;
   final EdgeInsetsGeometry? contentPadding;
+  final List<TextInputFormatter>? inputFormatters;
 
   const BaseTextField({
     Key? key,
@@ -26,6 +28,7 @@ class BaseTextField extends StatelessWidget {
     this.fillColor,
     this.onChanged,
     this.contentPadding,
+    this.inputFormatters,
   }) : super(key: key);
 
   @override
@@ -55,6 +58,8 @@ class BaseTextField extends StatelessWidget {
         ),
       ),
       validator: validator,
+      inputFormatters: inputFormatters,
+      onChanged: onChanged,
     );
   }
 }
