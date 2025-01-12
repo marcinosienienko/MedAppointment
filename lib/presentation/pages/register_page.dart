@@ -143,7 +143,10 @@ class _RegisterPageState extends State<RegisterPage> {
                         onPressed: () async {
                           if (_formKey.currentState!.validate()) {
                             await registerViewModel.registerUser();
+
                             if (registerViewModel.errorMessage == null) {
+                              registerViewModel.resetForm();
+                              registerViewModel.isLoading = false;
                               if (context.mounted) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
