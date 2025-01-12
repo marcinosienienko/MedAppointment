@@ -43,6 +43,16 @@ class RegisterViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  void resetForm() {
+    firstName = null;
+    lastName = null;
+    email = null;
+    phoneNumber = null;
+    password = null;
+    confirmPassword = null;
+    notifyListeners();
+  }
+
   Future<void> registerUser() async {
     if (firstName == null ||
         lastName == null ||
@@ -67,14 +77,12 @@ class RegisterViewModel extends ChangeNotifier {
 
     try {
       await _authModel.registerUser(
-        email: email!.trim(),
+        email: email!,
         password: password!,
-        firstName: firstName!.trim(),
-        lastName: lastName!.trim(),
-        phoneNumber: phoneNumber!.trim(),
+        firstName: firstName!,
+        lastName: lastName!,
+        phoneNumber: phoneNumber!,
       );
-      isLoading = false;
-      notifyListeners();
     } catch (e) {
       errorMessage = e.toString();
       isLoading = false;
