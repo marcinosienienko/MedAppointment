@@ -13,6 +13,8 @@ import 'package:medical_app/core/theme/app_colors.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:medical_app/data/viewmodels/register_page_viewmodel.dart';
 import 'package:medical_app/data/viewmodels/login_page_viewmodel.dart';
+import 'package:medical_app/data/viewmodels/auth_view_model.dart';
+import 'package:medical_app/presentation/pages/dashboard_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -33,6 +35,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => DoctorsViewModel()),
         ChangeNotifierProvider(create: (_) => RegisterViewModel()),
         ChangeNotifierProvider(create: (_) => LoginViewModel()),
+        ChangeNotifierProvider(create: (_) => AuthViewModel()),
       ],
       child: const MyApp(),
     ),
@@ -55,12 +58,13 @@ class MyApp extends StatelessWidget {
           foregroundColor: Colors.white,
         ),
       ),
-      initialRoute: '/home',
+      initialRoute: '/login',
       routes: {
         '/login': (context) => LoginPage(),
         '/register': (context) => RegisterPage(),
         '/home': (context) => const BottomNavigation(),
         '/profile': (context) => ProfilePage(),
+        '/dashboard': (context) => DashboardPage(),
         //'/test-page': (context) => TestFirestorePage()
       },
     );
