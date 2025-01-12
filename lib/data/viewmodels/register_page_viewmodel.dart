@@ -1,73 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:medical_app/data/models/auth_model.dart';
 
 class RegisterViewModel extends ChangeNotifier {
-  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+  final AuthModel _authModel = AuthModel();
 
   String? firstName;
   String? lastName;
   String? email;
   String? phoneNumber;
-  String? verificationCode;
   String? password;
-
-  bool isLoading = false;
+  String? confirmPassword;
   String? errorMessage;
+  bool isLoading = false;
 
-  Future<void> registerUser() async {
-    isLoading = true;
-    errorMessage = null;
-    notifyListeners();
-
-    try {
-      // Rejestracja za pomocą e-maila i hasła
-      final UserCredential userCredential = await _firebaseAuth
-          .createUserWithEmailAndPassword(email: email!, password: password!);
-
-      // Aktualizacja profilu użytkownika
-      await userCredential.user?.updateDisplayName("$firstName $lastName");
-
-      // Tutaj możesz zapisać dodatkowe dane użytkownika w Firestore
-      print("Użytkownik zarejestrowany: ${userCredential.user?.uid}");
-
-      // Resetuj formularz
-      resetForm();
-    } catch (e) {
-      errorMessage = _handleFirebaseError(e);
-      print("Błąd rejestracji: $errorMessage");
-    } finally {
-      isLoading = false;
-      notifyListeners();
-    }
-  }
-
-  void resetForm() {
-    firstName = null;
-    lastName = null;
-    email = null;
-    phoneNumber = null;
-    verificationCode = null;
-    password = null;
-    notifyListeners();
-  }
-
-  String? _handleFirebaseError(dynamic error) {
-    if (error is FirebaseAuthException) {
-      switch (error.code) {
-        case 'email-already-in-use':
-          return 'Adres e-mail jest już zarejestrowany.';
-        case 'invalid-email':
-          return 'Podany adres e-mail jest nieprawidłowy.';
-        case 'weak-password':
-          return 'Hasło musi mieć co najmniej 6 znaków.';
-        default:
-          return 'Wystąpił nieoczekiwany błąd: ${error.message}';
-      }
-    }
-    return 'Nieznany błąd.';
-  }
-
-  // Metody do ustawiania danych z pól tekstowych
   void setFirstName(String value) {
     firstName = value;
     notifyListeners();
@@ -91,5 +36,49 @@ class RegisterViewModel extends ChangeNotifier {
   void setPassword(String value) {
     password = value;
     notifyListeners();
+  }
+
+  void setConfirmPassword(String value) {
+    confirmPassword = value;
+    notifyListeners();
+  }
+
+  Future<void> registerUser() async {
+    if (firstName == null ||
+        lastName == null ||
+        email == null ||
+        phoneNumber == null ||
+        password == null ||
+        confirmPassword == null) {
+      errorMessage = "Wszystkie pola są wymagane.";
+      notifyListeners();
+      return;
+    }
+
+    if (password != confirmPassword) {
+      errorMessage = "Hasła nie są zgodne.";
+      notifyListeners();
+      return;
+    }
+
+    isLoading = true;
+    errorMessage = null;
+    notifyListeners();
+
+    try {
+      await _authModel.registerUser(
+        email: email!.trim(),
+        password: password!,
+        firstName: firstName!.trim(),
+        lastName: lastName!.trim(),
+        phoneNumber: phoneNumber!.trim(),
+      );
+      isLoading = false;
+      notifyListeners();
+    } catch (e) {
+      errorMessage = e.toString();
+      isLoading = false;
+      notifyListeners();
+    }
   }
 }

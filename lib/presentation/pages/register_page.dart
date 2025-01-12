@@ -8,8 +8,66 @@ import 'package:medical_app/presentation/widgets/inputs/veryfication_code_input.
 import 'package:provider/provider.dart';
 import 'package:medical_app/data/viewmodels/register_page_viewmodel.dart';
 
-class RegisterPage extends StatelessWidget {
+class RegisterPage extends StatefulWidget {
+  @override
+  State<RegisterPage> createState() => _RegisterPageState();
+}
+
+class _RegisterPageState extends State<RegisterPage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final TextEditingController _firstNameController = TextEditingController();
+  final TextEditingController _lastNameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    final registerViewModel =
+        Provider.of<RegisterViewModel>(context, listen: false);
+
+    // Initialize controller values based on ViewModel
+    _firstNameController.text = registerViewModel.firstName ?? '';
+    _lastNameController.text = registerViewModel.lastName ?? '';
+    _emailController.text = registerViewModel.email ?? '';
+    _phoneController.text = registerViewModel.phoneNumber ?? '';
+    _passwordController.text = registerViewModel.password ?? '';
+    _confirmPasswordController.text = registerViewModel.confirmPassword ?? '';
+
+    // Bind controllers to ViewModel methods
+    _firstNameController.addListener(() {
+      registerViewModel.setFirstName(_firstNameController.text);
+    });
+    _lastNameController.addListener(() {
+      registerViewModel.setLastName(_lastNameController.text);
+    });
+    _emailController.addListener(() {
+      registerViewModel.setEmail(_emailController.text);
+    });
+    _phoneController.addListener(() {
+      registerViewModel.setPhoneNumber(_phoneController.text);
+    });
+    _passwordController.addListener(() {
+      registerViewModel.setPassword(_passwordController.text);
+    });
+    _confirmPasswordController.addListener(() {
+      registerViewModel.setConfirmPassword(_confirmPasswordController.text);
+    });
+  }
+
+  @override
+  void dispose() {
+    _firstNameController.dispose();
+    _lastNameController.dispose();
+    _emailController.dispose();
+    _phoneController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,8 +96,7 @@ class RegisterPage extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       NameInput(
-                        controller: TextEditingController(
-                            text: registerViewModel.firstName),
+                        controller: _firstNameController,
                         hintText: 'Imię',
                         prefixIcon: Icons.person,
                         validationType: ValidationType.name,
@@ -47,8 +104,7 @@ class RegisterPage extends StatelessWidget {
                       ),
                       const SizedBox(height: 16),
                       NameInput(
-                        controller: TextEditingController(
-                            text: registerViewModel.lastName),
+                        controller: _lastNameController,
                         hintText: 'Nazwisko',
                         prefixIcon: Icons.person,
                         validationType: ValidationType.surname,
@@ -56,29 +112,25 @@ class RegisterPage extends StatelessWidget {
                       ),
                       const SizedBox(height: 16),
                       EmailTextField(
-                        controller: TextEditingController(
-                            text: registerViewModel.email),
+                        controller: _emailController,
                         onChanged: registerViewModel.setEmail,
                       ),
                       const SizedBox(height: 16),
                       PhoneNumberInput(
-                        controller: TextEditingController(
-                            text: registerViewModel.phoneNumber),
+                        controller: _phoneController,
                         onChanged: registerViewModel.setPhoneNumber,
                       ),
                       const SizedBox(height: 16),
-                      VerificationCodeInput(
-                        controller: TextEditingController(
-                            text: registerViewModel.verificationCode),
-                        onChanged: (value) =>
-                            registerViewModel.verificationCode = value,
+                      PasswordTextField(
+                        controller: _passwordController,
+                        hintText: 'Hasło',
+                        onChanged: registerViewModel.setPassword,
                       ),
                       const SizedBox(height: 16),
                       PasswordTextField(
-                        controller: TextEditingController(
-                            text: registerViewModel.password),
-                        hintText: 'Hasło',
-                        onChanged: registerViewModel.setPassword,
+                        controller: _confirmPasswordController,
+                        hintText: 'Potwierdź hasło',
+                        onChanged: registerViewModel.setConfirmPassword,
                       ),
                       const SizedBox(height: 24),
                       if (registerViewModel.errorMessage != null)
@@ -92,13 +144,16 @@ class RegisterPage extends StatelessWidget {
                           if (_formKey.currentState!.validate()) {
                             await registerViewModel.registerUser();
                             if (registerViewModel.errorMessage == null) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content:
-                                      Text('Rejestracja zakończona sukcesem!'),
-                                ),
-                              );
-                              Navigator.pop(context);
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                        'Rejestracja zakończona sukcesem!'),
+                                  ),
+                                );
+                                Navigator.pushReplacementNamed(
+                                    context, '/login');
+                              }
                             }
                           }
                         },
