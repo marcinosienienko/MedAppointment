@@ -74,11 +74,17 @@ class AuthViewModel extends ChangeNotifier {
   }
 
   /// Wylogowanie użytkownika
-  Future<void> logout() async {
+  Future<bool> logout() async {
     try {
+      _setLoading(true);
+      _setErrorMessage(null);
       await _authModel.logout();
+      _setLoading(false);
+      return true;
     } catch (e) {
       _setErrorMessage('Błąd wylogowania: ${e.toString()}');
+      _setLoading(false);
+      return false;
     }
   }
 

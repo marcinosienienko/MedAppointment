@@ -4,6 +4,7 @@ import 'package:medical_app/presentation/widgets/inputs/email_input.dart';
 import 'package:medical_app/presentation/widgets/inputs/password_input.dart';
 import 'package:medical_app/data/viewmodels/login_page_viewmodel.dart';
 import 'package:provider/provider.dart';
+import 'package:medical_app/data/viewmodels/user_vievmodel.dart';
 
 class LoginPage extends StatelessWidget {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
@@ -12,6 +13,7 @@ class LoginPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final userViewModel = Provider.of<UserViewModel>(context, listen: false);
     return Scaffold(
       backgroundColor: Colors.white,
       body: Center(
@@ -63,6 +65,9 @@ class LoginPage extends StatelessWidget {
                                         _passwordController.text.trim(),
                                       );
                                       if (success) {
+                                        userViewModel.fetchUserData();
+                                        _emailController.clear();
+                                        _passwordController.clear();
                                         ScaffoldMessenger.of(context)
                                             .showSnackBar(
                                           const SnackBar(
@@ -71,7 +76,7 @@ class LoginPage extends StatelessWidget {
                                           ),
                                         );
                                         Navigator.pushReplacementNamed(
-                                            context, '/dashboard');
+                                            context, '/home');
                                       }
                                     }
                                   },

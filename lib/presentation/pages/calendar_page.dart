@@ -8,6 +8,7 @@ import 'package:medical_app/data/models/appointment_model.dart';
 import 'package:medical_app/data/viewmodels/doctor_viewmodel.dart';
 import 'package:medical_app/presentation/pages/appointments_page.dart';
 import 'package:medical_app/data/models/slot_model.dart';
+import 'package:medical_app/presentation/widgets/navigation_bar.dart';
 
 class CalendarPage extends StatefulWidget {
   final String doctorId;
@@ -124,11 +125,14 @@ class _CalendarPageState extends State<CalendarPage> {
                         duration: Duration(milliseconds: 1000),
                       ));
                       Navigator.of(context).pop();
-                      Navigator.push(
+                      Navigator.pushAndRemoveUntil(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => AppointmentsPage(),
+                          builder: (context) => BottomNavigation(
+                            initialPageIndex: 1,
+                          ),
                         ),
+                        (Route<dynamic> route) => false,
                       );
                     },
                   );

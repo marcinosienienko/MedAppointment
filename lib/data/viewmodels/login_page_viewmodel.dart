@@ -27,8 +27,8 @@ class LoginViewModel extends ChangeNotifier {
     switch (code) {
       case 'user-not-found':
         return 'Nie znaleziono użytkownika z tym adresem e-mail.';
-      case 'wrong-password':
-        return 'Nieprawidłowe hasło.';
+      case 'invalid-credential':
+        return 'Nieprawidłowe dane logowania.';
       case 'invalid-email':
         return 'Nieprawidłowy format e-maila.';
       default:

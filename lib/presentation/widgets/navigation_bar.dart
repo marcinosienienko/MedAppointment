@@ -5,14 +5,28 @@ import 'package:medical_app/presentation/pages/settings_page.dart';
 import 'package:medical_app/core/theme/app_colors.dart';
 
 class BottomNavigation extends StatefulWidget {
-  const BottomNavigation({super.key});
+  final int initialPageIndex;
+
+  const BottomNavigation({super.key, required this.initialPageIndex});
 
   @override
   State<BottomNavigation> createState() => _BottomNavigationState();
 }
 
 class _BottomNavigationState extends State<BottomNavigation> {
-  int currentPageIndex = 0;
+  late int currentPageIndex;
+
+  @override
+  void initState() {
+    super.initState();
+    currentPageIndex = widget.initialPageIndex; // Ustaw domyślny indeks
+  }
+
+  void navigateToPage(int index) {
+    setState(() {
+      currentPageIndex = index;
+    });
+  }
 
   final List<Widget> _pages = [
     const DashboardPage(),
