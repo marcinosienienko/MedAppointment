@@ -4,7 +4,6 @@ import 'package:medical_app/presentation/widgets/inputs/email_input.dart';
 import 'package:medical_app/presentation/widgets/inputs/name_input.dart';
 import 'package:medical_app/presentation/widgets/inputs/password_input.dart';
 import 'package:medical_app/presentation/widgets/inputs/phone_number_input.dart';
-import 'package:medical_app/presentation/widgets/inputs/veryfication_code_input.dart';
 import 'package:provider/provider.dart';
 import 'package:medical_app/data/viewmodels/register_page_viewmodel.dart';
 

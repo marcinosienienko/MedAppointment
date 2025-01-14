@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:medical_app/data/models/user_model.dart';
 import 'package:medical_app/data/viewmodels/appointments_viewmodel.dart';
+import 'package:medical_app/data/viewmodels/user_vievmodel.dart';
 import 'package:medical_app/presentation/widgets/inputs/search_input.dart';
 import 'package:provider/provider.dart';
-import 'package:medical_app/data/models/appointment_model.dart';
 import 'package:medical_app/presentation/widgets/appointment_card.dart';
 
 class DashboardPage extends StatelessWidget {
@@ -12,14 +12,15 @@ class DashboardPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final appointmentsViewModel = Provider.of<AppointmentsViewModel>(context);
+    final userViewModel = Provider.of<UserViewModel>(context);
 
-    final user = UserModel(
-      id: '1',
-      email: 'jan.kowalski@example.com',
-      firstName: 'Jan',
-      lastName: 'Kowalski',
-      phoneNumber: '1234567890',
-    );
+    // final user = UserModel(
+    //   id: '1',
+    //   email: 'jan.kowalski@example.com',
+    //   firstName: 'Jan',
+    //   lastName: 'Kowalski',
+    //   phoneNumber: '1234567890',
+    // );
 
     return Scaffold(
       appBar: AppBar(
@@ -30,7 +31,9 @@ class DashboardPage extends StatelessWidget {
           children: [
             Expanded(
               child: Text(
-                'Witaj, ${user.firstName} ${user.lastName}',
+                userViewModel.currentUser != null
+                    ? '${userViewModel.currentUser!.firstName[0]}${userViewModel.currentUser!.lastName[0]}'
+                    : '',
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 24,
@@ -45,12 +48,12 @@ class DashboardPage extends StatelessWidget {
               child: CircleAvatar(
                 radius: 20,
                 backgroundColor: Colors.blueGrey,
-                backgroundImage: user.avatarUrl != null
-                    ? NetworkImage(user.avatarUrl!)
+                backgroundImage: userViewModel.currentUser?.avatarUrl != null
+                    ? NetworkImage(userViewModel.currentUser!.avatarUrl!)
                     : null,
-                child: user.avatarUrl == null
+                child: userViewModel.currentUser?.avatarUrl == null
                     ? Text(
-                        '${user.firstName[0]}${user.lastName[0]}',
+                        '',
                         style: const TextStyle(
                           fontSize: 20,
                           color: Colors.white,

@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:medical_app/data/models/appointment_model.dart';
 import 'package:medical_app/data/models/doctor_model.dart';
-import 'package:medical_app/presentation/pages/appointment.dart';
 import 'package:medical_app/presentation/pages/calendar_page.dart';
 import 'package:medical_app/presentation/widgets/buttons/PrimaryButton.dart';
 
