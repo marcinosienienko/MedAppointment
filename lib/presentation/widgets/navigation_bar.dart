@@ -3,6 +3,7 @@ import 'package:medical_app/presentation/pages/dashboard_page.dart';
 import 'package:medical_app/presentation/pages/appointments_page.dart';
 import 'package:medical_app/presentation/pages/settings_page.dart';
 import 'package:medical_app/core/theme/app_colors.dart';
+import 'package:medical_app/presentation/pages/profile_page.dart';
 
 class BottomNavigation extends StatefulWidget {
   final int initialPageIndex;
@@ -31,7 +32,8 @@ class _BottomNavigationState extends State<BottomNavigation> {
   final List<Widget> _pages = [
     const DashboardPage(),
     AppointmentsPage(),
-    const SettingsPage(),
+    // const SettingsPage(),
+    const ProfilePage(),
   ];
 
   @override
@@ -58,10 +60,15 @@ class _BottomNavigationState extends State<BottomNavigation> {
             icon: Icon(Icons.calendar_month_outlined),
             label: 'Wizyty',
           ),
+          // NavigationDestination(
+          //   selectedIcon: Icon(Icons.settings),
+          //   icon: Icon(Icons.settings_outlined),
+          //   label: 'Ustawienia',
+          // ),
           NavigationDestination(
-            selectedIcon: Icon(Icons.settings),
-            icon: Icon(Icons.settings_outlined),
-            label: 'Ustawienia',
+            selectedIcon: Icon(Icons.person),
+            icon: Icon(Icons.person_outlined),
+            label: 'Profil',
           ),
         ],
       ),
