@@ -1,26 +1,32 @@
 import 'package:flutter/material.dart';
-import 'package:medical_app/data/models/user_model.dart';
 import 'package:medical_app/data/viewmodels/appointments_viewmodel.dart';
 import 'package:medical_app/data/viewmodels/user_vievmodel.dart';
 import 'package:medical_app/presentation/widgets/inputs/search_input.dart';
 import 'package:provider/provider.dart';
 import 'package:medical_app/presentation/widgets/appointment_card.dart';
+import 'package:medical_app/presentation/widgets/navigation_bar.dart';
 
 class DashboardPage extends StatelessWidget {
   const DashboardPage({super.key});
+
+  String capitalize(String name) {
+    if (name.isEmpty) {
+      return name;
+    }
+    return name[0].toUpperCase() + name.substring(1).toLowerCase();
+  }
+
+  String capitalizeFullName(String fullName) {
+    return fullName
+        .split(' ')
+        .map((word) => capitalize(word))
+        .join(' '); // Obsługa każdego słowa z osobna
+  }
 
   @override
   Widget build(BuildContext context) {
     final appointmentsViewModel = Provider.of<AppointmentsViewModel>(context);
     final userViewModel = Provider.of<UserViewModel>(context);
-
-    // final user = UserModel(
-    //   id: '1',
-    //   email: 'jan.kowalski@example.com',
-    //   firstName: 'Jan',
-    //   lastName: 'Kowalski',
-    //   phoneNumber: '1234567890',
-    // );
 
     return Scaffold(
       appBar: AppBar(
@@ -32,8 +38,9 @@ class DashboardPage extends StatelessWidget {
             Expanded(
               child: Text(
                 userViewModel.currentUser != null
-                    ? '${userViewModel.currentUser!.firstName[0]}${userViewModel.currentUser!.lastName[0]}'
-                    : '',
+                    ? capitalizeFullName(
+                        'Witaj ${userViewModel.currentUser!.firstName}')
+                    : 'Witaj, Gościu', // Tekst domyślny, jeśli użytkownik nie jest zalogowany
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 24,
@@ -43,7 +50,14 @@ class DashboardPage extends StatelessWidget {
             ),
             GestureDetector(
               onTap: () {
-                Navigator.pushNamed(context, '/profile');
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => BottomNavigation(
+                      initialPageIndex: 2,
+                    ),
+                  ),
+                );
               },
               child: CircleAvatar(
                 radius: 20,
@@ -53,7 +67,7 @@ class DashboardPage extends StatelessWidget {
                     : null,
                 child: userViewModel.currentUser?.avatarUrl == null
                     ? Text(
-                        '',
+                        '${userViewModel.currentUser?.firstName[0] ?? 'U'}${userViewModel.currentUser?.lastName[0] ?? 'N'}', // Inicjały użytkownika
                         style: const TextStyle(
                           fontSize: 20,
                           color: Colors.white,
