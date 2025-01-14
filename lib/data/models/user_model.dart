@@ -5,6 +5,11 @@ class UserModel {
   final String lastName;
   final String phoneNumber;
   final String? avatarUrl;
+  final String? street;
+  final String? houseNumber;
+  final String? apartmentNumber;
+  final String? city;
+  final String? pesel; // Zaszyfrowany PESEL
 
   UserModel({
     required this.id,
@@ -13,6 +18,11 @@ class UserModel {
     required this.lastName,
     required this.phoneNumber,
     this.avatarUrl,
+    this.street,
+    this.houseNumber,
+    this.apartmentNumber,
+    this.city,
+    this.pesel,
   });
 
   String get name => '$firstName $lastName';
@@ -25,35 +35,24 @@ class UserModel {
       lastName: data['lastName'] ?? '',
       phoneNumber: data['phoneNumber'] ?? '',
       avatarUrl: data['avatarUrl'],
-    );
-  }
-
-  factory UserModel.fromJson(Map<String, dynamic> json) {
-    return UserModel(
-      id: json['id'],
-      email: json['email'],
-      firstName: json['firstName'],
-      lastName: json['lastName'],
-      phoneNumber: json['phoneNumber'],
-      avatarUrl: json['avatarUrl'],
+      street: data['street'],
+      houseNumber: data['houseNumber'],
+      apartmentNumber: data['apartmentNumber'],
+      city: data['city'],
+      pesel: data['pesel'], // Zaszyfrowany PESEL
     );
   }
 
   Map<String, dynamic> toMap() => {
-        'id': id,
         'email': email,
         'firstName': firstName,
         'lastName': lastName,
         'phoneNumber': phoneNumber,
         'avatarUrl': avatarUrl,
-      };
-
-  Map<String, dynamic> toJson() => {
-        'id': id,
-        'email': email,
-        'firstName': firstName,
-        'lastName': lastName,
-        'phoneNumber': phoneNumber,
-        'avatarUrl': avatarUrl,
+        'street': street,
+        'houseNumber': houseNumber,
+        'apartmentNumber': apartmentNumber,
+        'city': city,
+        'pesel': pesel, // Zaszyfrowany PESEL
       };
 }

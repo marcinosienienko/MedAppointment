@@ -31,8 +31,12 @@ class LoginViewModel extends ChangeNotifier {
         return 'Nieprawidłowe dane logowania.';
       case 'invalid-email':
         return 'Nieprawidłowy format e-maila.';
+      case 'invalid-password':
+        return 'Nieprawidłowe hasło.';
+      case 'email-already-exist':
+        return 'Użytkownik z tym adresem e-mail już istnieje.';
       default:
-        return 'Wystąpił nieznany błąd. Spróbuj ponownie.';
+        return 'Połączenie z serwerem nie powiodło się. Spróbuj ponownie.';
     }
   }
 
