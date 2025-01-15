@@ -97,54 +97,58 @@ class _CalendarPageState extends State<CalendarPage> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.only(
-                bottom: 84.0, top: 8.0, left: 16.0, right: 16.0),
-            child: PrimaryButton(
-              text: 'Zarezerwuj wizytę',
-              onPressed: () {
-                if (slotViewModel.selectedSlot != null) {
-                  _showAppointmentConfirmation(
-                    context,
-                    slotViewModel.selectedSlot!,
-                    () {
-                      appointmentsViewModel.addAppointment(Appointment(
-                        id: slotViewModel.selectedSlot!.id,
-                        slotId: slotViewModel.selectedSlot!.id,
-                        doctorId: widget.doctorId,
-                        doctorName: doctorViewModel
-                            .getDoctorById(widget.doctorId)!
-                            .name,
-                        specialization: doctorViewModel
-                            .getDoctorById(widget.doctorId)!
-                            .specialization,
-                        dateTime: slotViewModel.selectedSlot!.dateTime,
-                      ));
-                      slotViewModel.reserveSlot(slotViewModel.selectedSlot!.id);
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                        content: Text('Wizyta zarezerwowana'),
-                        duration: Duration(milliseconds: 1000),
-                      ));
-                      Navigator.of(context).pop();
-                      Navigator.pushAndRemoveUntil(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => BottomNavigation(
-                            initialPageIndex: 1,
+              padding: const EdgeInsets.only(
+                  bottom: 84.0, top: 8.0, left: 16.0, right: 16.0),
+              child: PrimaryButton(
+                text: 'Zarezerwuj wizytę',
+                onPressed: () {
+                  if (slotViewModel.selectedSlot != null) {
+                    _showAppointmentConfirmation(
+                      context,
+                      slotViewModel.selectedSlot!,
+                      () async {
+                        final appointment = Appointment(
+                          id: slotViewModel.selectedSlot!.id,
+                          slotId: slotViewModel.selectedSlot!.id,
+                          doctorId: widget.doctorId,
+                          doctorName: doctorViewModel
+                              .getDoctorById(widget.doctorId)!
+                              .name,
+                          specialization: doctorViewModel
+                              .getDoctorById(widget.doctorId)!
+                              .specialization,
+                          dateTime: slotViewModel.selectedSlot!.dateTime,
+                        );
+
+                        await appointmentsViewModel.addAppointment(appointment);
+                        slotViewModel
+                            .reserveSlot(slotViewModel.selectedSlot!.id);
+
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content: Text('Wizyta zarezerwowana'),
+                          duration: Duration(milliseconds: 1000),
+                        ));
+
+                        Navigator.of(context).pop();
+                        Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => BottomNavigation(
+                              initialPageIndex: 1,
+                            ),
                           ),
-                        ),
-                        (Route<dynamic> route) => false,
-                      );
-                    },
-                  );
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text('Wybierz termin wizyty'),
-                    duration: Duration(milliseconds: 1000),
-                  ));
-                }
-              },
-            ),
-          ),
+                          (Route<dynamic> route) => false,
+                        );
+                      },
+                    );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      content: Text('Wybierz termin wizyty'),
+                      duration: Duration(milliseconds: 1000),
+                    ));
+                  }
+                },
+              )),
         ],
       ),
     );

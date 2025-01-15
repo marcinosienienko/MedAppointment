@@ -1,36 +1,79 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:medical_app/data/models/appointment_model.dart';
 import 'package:medical_app/data/viewmodels/slot_viewmodel.dart';
 
 class AppointmentsViewModel extends ChangeNotifier {
-  final List<Appointment> _appointments = [];
-  final SlotViewModel _slotViewModel;
-
-  AppointmentsViewModel(this._slotViewModel);
+  final SlotViewModel? slotViewModel;
+  List<Appointment> _appointments = [];
+  AppointmentsViewModel(this.slotViewModel); // Konstruktor z parametrem
 
   List<Appointment> get appointments => _appointments;
 
-  void addAppointment(Appointment appointment) {
+  Future<void> addAppointment(Appointment appointment) async {
+    if (_appointments.any((existing) => existing.id == appointment.id)) {
+      print('Wizyta już istnieje: ${appointment.id}');
+      return;
+    }
     _appointments.add(appointment);
+    print('Dodano wizytę: ${appointment.toJson()}');
+
+    // Rezerwuj slot
+    slotViewModel?.reserveSlot(appointment.slotId);
+
+    await _saveToPreferences();
     notifyListeners();
   }
 
-  void cancelAppointment(String appointmentId) {
+  Future<void> cancelAppointment(String id) async {
     final appointment = _appointments.firstWhere(
-      (appointment) => appointment.id == appointmentId,
+      (appointment) => appointment.id == id,
       orElse: () => throw Exception('Appointment not found'),
     );
 
     if (appointment != null) {
       _appointments.remove(appointment);
+      print('Anulowano wizytę: $id');
 
-      // Przekazujemy doctorId razem z slotId do SlotViewModel
-      _slotViewModel.restoreSlotAvailability(
+      // Odblokuj slot
+      slotViewModel?.restoreSlotAvailability(
         appointment.slotId,
         appointment.doctorId,
       );
-    }
 
+      await _saveToPreferences();
+      notifyListeners();
+    } else {
+      print('Nie znaleziono wizyty o ID: $id');
+    }
+  }
+
+  Future<void> loadAppointmentsFromPreferences() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? appointmentsJson = prefs.getString('appointments');
+    if (appointmentsJson != null && appointmentsJson.isNotEmpty) {
+      List<dynamic> decoded = json.decode(appointmentsJson);
+      _appointments =
+          decoded.map((data) => Appointment.fromJson(data)).toList();
+
+      // Aktualizuj stan slotów
+      for (var appointment in _appointments) {
+        slotViewModel?.reserveSlot(appointment.slotId);
+      }
+
+      print('Załadowane wizyty: $_appointments');
+    } else {
+      _appointments = [];
+      print('Brak zapisanych wizyt w SharedPreferences');
+    }
     notifyListeners();
+  }
+
+  Future<void> _saveToPreferences() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<Map<String, dynamic>> appointmentsJson =
+        _appointments.map((appointment) => appointment.toJson()).toList();
+    await prefs.setString('appointments', json.encode(appointmentsJson));
   }
 }

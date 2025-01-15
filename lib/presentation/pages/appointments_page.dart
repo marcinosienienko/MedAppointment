@@ -3,7 +3,21 @@ import 'package:provider/provider.dart';
 import 'package:medical_app/data/viewmodels/appointments_viewmodel.dart';
 import 'package:medical_app/data/models/appointment_model.dart';
 
-class AppointmentsPage extends StatelessWidget {
+class AppointmentsPage extends StatefulWidget {
+  @override
+  _AppointmentsPageState createState() => _AppointmentsPageState();
+}
+
+class _AppointmentsPageState extends State<AppointmentsPage> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<AppointmentsViewModel>(context, listen: false)
+          .loadAppointmentsFromPreferences();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final appointmentsViewModel = Provider.of<AppointmentsViewModel>(context);
@@ -27,7 +41,7 @@ class AppointmentsPage extends StatelessWidget {
     );
   }
 
-  AppointmentCard(Appointment appointment, BuildContext context) {
+  Widget AppointmentCard(Appointment appointment, BuildContext context) {
     return Card(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12.0),
@@ -35,8 +49,10 @@ class AppointmentsPage extends StatelessWidget {
       elevation: 3,
       margin: EdgeInsets.symmetric(vertical: 8.0),
       child: ListTile(
-        title: Text(appointment.doctorName,
-            style: TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(
+          appointment.doctorName,
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
