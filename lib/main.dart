@@ -27,11 +27,12 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (context) => SlotViewModel()),
-        ChangeNotifierProvider(
-          create: (context) => AppointmentsViewModel(
-            Provider.of<SlotViewModel>(context, listen: false),
-          ),
+        ChangeNotifierProvider(create: (_) => SlotViewModel()),
+        ChangeNotifierProxyProvider<SlotViewModel, AppointmentsViewModel>(
+          create: (_) => AppointmentsViewModel(null),
+          update: (_, slotViewModel, previousAppointmentsViewModel) =>
+              previousAppointmentsViewModel ??
+              AppointmentsViewModel(slotViewModel),
         ),
         ChangeNotifierProvider(create: (_) => DoctorsViewModel()),
         ChangeNotifierProvider(create: (_) => RegisterViewModel()),

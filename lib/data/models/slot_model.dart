@@ -10,13 +10,22 @@ class Slot {
     required this.doctorId,
     required this.isAvailable,
   });
+
+  // Konwersja na JSON
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'dateTime': dateTime.toIso8601String(),
+        'doctorId': doctorId,
+        'isAvailable': isAvailable,
+      };
+
+  // Tworzenie obiektu Slot z JSON
+  factory Slot.fromJson(Map<String, dynamic> json) {
+    return Slot(
+      id: json['id'],
+      dateTime: DateTime.parse(json['dateTime']),
+      doctorId: json['doctorId'],
+      isAvailable: json['isAvailable'],
+    );
+  }
 }
-
-// Map<DateTime, List<Slot>> _slots = {
-//   DateTime(2025, 1, 9): [Slot(DateTime(2025, 1, 9, 9, 0), true)],
-//   DateTime(2025, 1, 10): [Slot(DateTime(2025, 1, 10, 10, 0), false)],
-// };
-
-// List<Slot> _getSlotsForDay(DateTime day) {
-//   return _slots[day] ?? [];
-// }
