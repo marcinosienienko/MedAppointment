@@ -10,9 +10,10 @@ class UserViewModel extends ChangeNotifier {
   static const String encryptionKey = '0123456789abcdef0123456789abcdef';
   final _encrypter =
       encrypt.Encrypter(encrypt.AES(encrypt.Key.fromUtf8(encryptionKey)));
-  final _iv = encrypt.IV.fromLength(16); // Inicjalizacyjny wektor
+  final _iv = encrypt.IV.fromUtf8('abcdefghijklmnop'); // Inicjalizacyjny wektor
 
   UserModel? _currentUser;
+  final TextEditingController peselController = TextEditingController();
 
   UserModel? get currentUser => _currentUser;
 
@@ -23,18 +24,21 @@ class UserViewModel extends ChangeNotifier {
 
       final user = _auth.currentUser;
       if (user != null) {
-        print("Zalogowany użytkownik");
-
         final doc = await _firestore.collection('users').doc(user.uid).get();
         if (doc.exists) {
           final data = doc.data()!;
           if (data['pesel'] != null) {
-            // Odszyfruj PESEL
-            final decryptedPesel = _decryptPesel(data['pesel']);
-            data['pesel'] = decryptedPesel; // Dodaj odszyfrowany PESEL
+            try {
+              final decryptedPesel = _decryptPesel(data['pesel']);
+              data['pesel'] = decryptedPesel; // Odszyfrowany PESEL
+            } catch (e) {
+              print("Błąd odszyfrowywania PESEL: $e");
+              data['pesel'] = ''; // Opcjonalnie ustaw pustą wartość
+            }
           }
-          print("Dane użytkownika pobrane z Firestore: ${data}");
           _currentUser = UserModel.fromMap(data, user.uid);
+          // Przypisz odszyfrowany PESEL do kontrolera
+          peselController.text = _currentUser?.pesel ?? '';
         } else {
           print("Dane użytkownika nie istnieją w Firestore.");
         }
@@ -120,16 +124,26 @@ class UserViewModel extends ChangeNotifier {
     }
   }
 
-  /// Szyfrowanie PESEL
   String _encryptPesel(String pesel) {
-    final encrypted = _encrypter.encrypt(pesel, iv: _iv);
-    return encrypted.base64;
+    try {
+      final encrypted = _encrypter.encrypt(pesel, iv: _iv);
+      print("Zaszyfrowany PESEL: ${encrypted.base64}");
+      return encrypted.base64;
+    } catch (e) {
+      print("Błąd podczas szyfrowania PESEL: $e");
+      rethrow;
+    }
   }
 
-  /// Odszyfrowywanie PESEL
   String _decryptPesel(String encryptedPesel) {
-    final decrypted = _encrypter.decrypt64(encryptedPesel, iv: _iv);
-    return decrypted;
+    try {
+      final decrypted = _encrypter.decrypt64(encryptedPesel, iv: _iv);
+      print("Odszyfrowany PESEL: $decrypted");
+      return decrypted;
+    } catch (e) {
+      print("Błąd podczas odszyfrowywania PESEL: $e");
+      rethrow;
+    }
   }
 
   /// Wylogowanie użytkownika
@@ -141,5 +155,11 @@ class UserViewModel extends ChangeNotifier {
     } catch (e) {
       print("Błąd podczas wylogowania: $e");
     }
+  }
+
+  @override
+  void dispose() {
+    peselController.dispose();
+    super.dispose();
   }
 }

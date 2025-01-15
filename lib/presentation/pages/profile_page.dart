@@ -206,6 +206,8 @@ class _ProfilePageState extends State<ProfilePage> {
                                       city: cityController.text,
                                       pesel: peselController.text,
                                     );
+                                    await userViewModel.fetchUserData();
+
                                     setState(() {
                                       isEditing = false;
                                     });
