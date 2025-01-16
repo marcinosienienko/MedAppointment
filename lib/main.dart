@@ -15,7 +15,7 @@ import 'package:medical_app/data/viewmodels/register_page_viewmodel.dart';
 import 'package:medical_app/data/viewmodels/login_page_viewmodel.dart';
 import 'package:medical_app/data/viewmodels/auth_view_model.dart';
 import 'package:medical_app/presentation/pages/dashboard_page.dart';
-import 'package:medical_app/data/viewmodels/user_vievmodel.dart';
+import 'package:medical_app/data/viewmodels/user_viewmodel.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
