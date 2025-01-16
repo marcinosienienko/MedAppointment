@@ -4,7 +4,7 @@ import 'package:medical_app/presentation/widgets/inputs/email_input.dart';
 import 'package:medical_app/presentation/widgets/inputs/password_input.dart';
 import 'package:medical_app/data/viewmodels/login_page_viewmodel.dart';
 import 'package:provider/provider.dart';
-import 'package:medical_app/data/viewmodels/user_vievmodel.dart';
+import 'package:medical_app/data/viewmodels/user_viewmodel.dart';
 
 class LoginPage extends StatelessWidget {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();

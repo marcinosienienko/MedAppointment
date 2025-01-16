@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:medical_app/data/viewmodels/appointments_viewmodel.dart';
-import 'package:medical_app/data/viewmodels/user_vievmodel.dart';
+import 'package:medical_app/data/viewmodels/user_viewmodel.dart';
 import 'package:medical_app/presentation/widgets/inputs/search_input.dart';
 import 'package:provider/provider.dart';
 import 'package:medical_app/presentation/widgets/appointment_card.dart';
