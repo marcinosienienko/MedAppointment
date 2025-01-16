@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:medical_app/data/viewmodels/appointments_viewmodel.dart';
 import 'package:medical_app/data/models/appointment_model.dart';
+import 'package:medical_app/data/viewmodels/slot_viewmodel.dart';
 
 class AppointmentsPage extends StatefulWidget {
   @override
@@ -66,14 +67,15 @@ class _AppointmentsPageState extends State<AppointmentsPage> {
         trailing: IconButton(
           icon: Icon(Icons.cancel, color: Colors.red),
           onPressed: () {
-            _showCancelDialog(context, appointment.id);
+            _showCancelDialog(context, appointment.id, appointment.doctorId);
           },
         ),
       ),
     );
   }
 
-  void _showCancelDialog(BuildContext context, String appointmentId) {
+  void _showCancelDialog(
+      BuildContext context, String appointmentId, String doctorId) {
     showDialog(
       context: context,
       builder: (context) {
@@ -89,6 +91,8 @@ class _AppointmentsPageState extends State<AppointmentsPage> {
             ),
             ElevatedButton(
               onPressed: () {
+                Provider.of<SlotViewModel>(context, listen: false)
+                    .restoreSlotAvailability(appointmentId, doctorId);
                 Provider.of<AppointmentsViewModel>(context, listen: false)
                     .cancelAppointment(appointmentId);
                 Navigator.of(context).pop();

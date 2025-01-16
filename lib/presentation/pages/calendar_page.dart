@@ -6,9 +6,8 @@ import 'package:medical_app/presentation/widgets/buttons/PrimaryButton.dart';
 import 'package:medical_app/data/viewmodels/appointments_viewmodel.dart';
 import 'package:medical_app/data/models/appointment_model.dart';
 import 'package:medical_app/data/viewmodels/doctor_viewmodel.dart';
-import 'package:medical_app/presentation/pages/appointments_page.dart';
-import 'package:medical_app/data/models/slot_model.dart';
 import 'package:medical_app/presentation/widgets/navigation_bar.dart';
+import 'package:medical_app/data/models/slot_model.dart';
 
 class CalendarPage extends StatefulWidget {
   final String doctorId;
@@ -23,6 +22,7 @@ class _CalendarPageState extends State<CalendarPage> {
   @override
   void initState() {
     super.initState();
+    // Ustawienie aktualnego ID lekarza i inicjalizacja slotów
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final slotViewModel = Provider.of<SlotViewModel>(context, listen: false);
       slotViewModel.setCurrentDoctorId(widget.doctorId);
@@ -35,12 +35,14 @@ class _CalendarPageState extends State<CalendarPage> {
     final doctorViewModel = Provider.of<DoctorsViewModel>(context);
     final appointmentsViewModel =
         Provider.of<AppointmentsViewModel>(context, listen: false);
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Kalendarz wizyt'),
       ),
       body: Column(
         children: [
+          // Kalendarz
           TableCalendar(
             locale: "pl_PL",
             firstDay: DateTime.now(),
@@ -56,11 +58,13 @@ class _CalendarPageState extends State<CalendarPage> {
             headerStyle:
                 HeaderStyle(titleCentered: true, formatButtonVisible: false),
           ),
+
+          // Siatka slotów
           Expanded(
             child: GridView.builder(
-              padding: EdgeInsets.all(16.0),
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 6, // Liczba kolumn w siatce
+              padding: const EdgeInsets.all(16.0),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 6, // Liczba kolumn
                 crossAxisSpacing: 8.0,
                 mainAxisSpacing: 4.0,
               ),
@@ -68,10 +72,10 @@ class _CalendarPageState extends State<CalendarPage> {
               itemBuilder: (context, index) {
                 final slot = slotViewModel.slots[index];
                 final isSelected = slotViewModel.selectedSlot == slot;
+
                 return GestureDetector(
                   onTap: slot.isAvailable
                       ? () {
-                          print('Slot clicked: ${slot.id}');
                           slotViewModel.selectSlot(slot);
                         }
                       : null,
@@ -96,87 +100,96 @@ class _CalendarPageState extends State<CalendarPage> {
               },
             ),
           ),
+
+          // Przycisk "Zarezerwuj wizytę"
           Padding(
-              padding: const EdgeInsets.only(
-                  bottom: 84.0, top: 8.0, left: 16.0, right: 16.0),
-              child: PrimaryButton(
-                text: 'Zarezerwuj wizytę',
-                onPressed: () {
-                  if (slotViewModel.selectedSlot != null) {
-                    _showAppointmentConfirmation(
-                      context,
-                      slotViewModel.selectedSlot!,
-                      () async {
-                        final appointment = Appointment(
-                          id: slotViewModel.selectedSlot!.id,
-                          slotId: slotViewModel.selectedSlot!.id,
-                          doctorId: widget.doctorId,
-                          doctorName: doctorViewModel
-                              .getDoctorById(widget.doctorId)!
-                              .name,
-                          specialization: doctorViewModel
-                              .getDoctorById(widget.doctorId)!
-                              .specialization,
-                          dateTime: slotViewModel.selectedSlot!.dateTime,
-                        );
+            padding:
+                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            child: PrimaryButton(
+              text: 'Zarezerwuj wizytę',
+              onPressed: () {
+                if (slotViewModel.selectedSlot != null) {
+                  _showAppointmentConfirmation(
+                    context,
+                    slotViewModel.selectedSlot!,
+                    () async {
+                      // Utwórz nową wizytę
+                      final appointment = Appointment(
+                        id: slotViewModel.selectedSlot!.id,
+                        slotId: slotViewModel.selectedSlot!.id,
+                        doctorId: widget.doctorId,
+                        doctorName: doctorViewModel
+                            .getDoctorById(widget.doctorId)!
+                            .name,
+                        specialization: doctorViewModel
+                            .getDoctorById(widget.doctorId)!
+                            .specialization,
+                        dateTime: slotViewModel.selectedSlot!.dateTime,
+                      );
 
-                        await appointmentsViewModel.addAppointment(appointment);
-                        slotViewModel
-                            .reserveSlot(slotViewModel.selectedSlot!.id);
+                      // Dodaj wizytę i zarezerwuj slot
+                      await appointmentsViewModel.addAppointment(appointment);
+                      slotViewModel.reserveSlot(slotViewModel.selectedSlot!.id);
 
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
                           content: Text('Wizyta zarezerwowana'),
                           duration: Duration(milliseconds: 1000),
-                        ));
+                        ),
+                      );
 
-                        Navigator.of(context).pop();
-                        Navigator.pushAndRemoveUntil(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => BottomNavigation(
-                              initialPageIndex: 1,
-                            ),
+                      // Przejdź do ekranu z listą wizyt
+                      Navigator.of(context).pushAndRemoveUntil(
+                        MaterialPageRoute(
+                          builder: (context) => BottomNavigation(
+                            initialPageIndex: 1,
                           ),
-                          (Route<dynamic> route) => false,
-                        );
-                      },
-                    );
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        ),
+                        (Route<dynamic> route) => false,
+                      );
+                    },
+                  );
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
                       content: Text('Wybierz termin wizyty'),
                       duration: Duration(milliseconds: 1000),
-                    ));
-                  }
-                },
-              )),
+                    ),
+                  );
+                }
+              },
+            ),
+          ),
         ],
       ),
     );
   }
-}
 
-void _showAppointmentConfirmation(
-    BuildContext context, Slot slot, VoidCallback onConfirm) {
-  showDialog(
-    context: context,
-    builder: (context) => AlertDialog(
-      title: Text('Czy na pewno chcesz zarezerwować wizytę?'),
-      content: Text(
-          'W dniu ${slot.dateTime.day}.${slot.dateTime.month}.${slot.dateTime.year} o ${slot.dateTime.hour}:${slot.dateTime.minute}'),
-      actions: [
-        TextButton(
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-          child: Text('Anuluj'),
+  void _showAppointmentConfirmation(
+      BuildContext context, Slot slot, VoidCallback onConfirm) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Czy na pewno chcesz zarezerwować wizytę?'),
+        content: Text(
+          'W dniu ${slot.dateTime.day}.${slot.dateTime.month}.${slot.dateTime.year} o ${slot.dateTime.hour}:${slot.dateTime.minute}',
         ),
-        TextButton(
-          onPressed: () {
-            onConfirm();
-          },
-          child: Text('Zarezerwuj'),
-        ),
-      ],
-    ),
-  );
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: const Text('Anuluj'),
+          ),
+          TextButton(
+            onPressed: () {
+              onConfirm();
+              Navigator.of(context).pop();
+            },
+            child: const Text('Zarezerwuj'),
+          ),
+        ],
+      ),
+    );
+  }
 }
