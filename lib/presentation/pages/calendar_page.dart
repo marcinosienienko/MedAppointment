@@ -8,6 +8,7 @@ import 'package:medical_app/data/models/appointment_model.dart';
 import 'package:medical_app/data/viewmodels/doctor_viewmodel.dart';
 import 'package:medical_app/presentation/widgets/navigation_bar.dart';
 import 'package:medical_app/data/models/slot_model.dart';
+import 'package:medical_app/data/viewmodels/user_viewmodel.dart';
 
 class CalendarPage extends StatefulWidget {
   final String doctorId;
@@ -35,6 +36,8 @@ class _CalendarPageState extends State<CalendarPage> {
     final doctorViewModel = Provider.of<DoctorsViewModel>(context);
     final appointmentsViewModel =
         Provider.of<AppointmentsViewModel>(context, listen: false);
+    final userViewModel = Provider.of<UserViewModel>(context, listen: false);
+    final userId = userViewModel.currentUser?.id ?? '';
 
     return Scaffold(
       appBar: AppBar(
@@ -128,8 +131,10 @@ class _CalendarPageState extends State<CalendarPage> {
                       );
 
                       // Dodaj wizytę i zarezerwuj slot
-                      await appointmentsViewModel.addAppointment(appointment);
-                      slotViewModel.reserveSlot(slotViewModel.selectedSlot!.id);
+                      await appointmentsViewModel.addAppointment(
+                          appointment, userId);
+                      await slotViewModel
+                          .reserveSlot(slotViewModel.selectedSlot!.id);
 
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
