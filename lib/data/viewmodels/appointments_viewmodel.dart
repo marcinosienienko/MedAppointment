@@ -16,11 +16,16 @@ class AppointmentsViewModel extends ChangeNotifier {
       print('Wizyta już istnieje: ${appointment.id}');
       return;
     }
+
     _appointments.add(appointment);
     print('Dodano wizytę: ${appointment.toJson()}');
 
-    // Rezerwuj slot
-    slotViewModel?.reserveSlot(appointment.slotId);
+    // Upewnij się, że slot jest zarezerwowany
+    if (slotViewModel != null) {
+      slotViewModel!.reserveSlot(appointment.slotId);
+    } else {
+      print('SlotViewModel jest niedostępny!');
+    }
 
     await _saveToPreferences();
     notifyListeners();

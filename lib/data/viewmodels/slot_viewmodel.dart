@@ -64,6 +64,7 @@ class SlotViewModel extends ChangeNotifier {
     if (_currentDoctorId == null ||
         !doctorSlots.containsKey(_currentDoctorId)) {
       filteredSlots = [];
+      print('Filtered slots: [] (no doctor ID or no slots)');
       return;
     }
 
@@ -75,6 +76,8 @@ class SlotViewModel extends ChangeNotifier {
           slot.dateTime.day == selectedDay.day;
     }).toList();
 
+    print(
+        'Filtered slots for day $selectedDay: ${filteredSlots.map((s) => s.id).toList()}');
     notifyListeners();
   }
 
@@ -105,17 +108,42 @@ class SlotViewModel extends ChangeNotifier {
   }
 
   void restoreSlotAvailability(String slotId, String doctorId) {
-    if (!doctorSlots.containsKey(doctorId)) return;
+    if (!doctorSlots.containsKey(doctorId)) {
+      print('Doctor ID $doctorId not found in doctorSlots');
+      return;
+    }
 
     final slots = doctorSlots[doctorId];
-    if (slots == null) return;
+    if (slots == null) {
+      print('No slots found for Doctor ID $doctorId');
+      return;
+    }
 
-    final slot = slots.firstWhere((slot) => slot.id == slotId,
-        orElse: () => throw Exception('Slot not found'));
-    slot.isAvailable = true;
+    final slot = slots.firstWhere(
+      (slot) => slot.id == slotId,
+      orElse: () {
+        print('Slot ID $slotId not found for Doctor ID $doctorId');
+        return Slot(
+            id: '', dateTime: DateTime.now(), doctorId: '', isAvailable: true);
+      },
+    );
 
-    _saveSlotsToPreferences(); // Save changes
-    notifyListeners();
+    if (slot.id.isNotEmpty) {
+      print(
+          'Before restoring: Slot ID: ${slot.id}, isAvailable: ${slot.isAvailable}');
+      slot.isAvailable = true;
+      print(
+          'After restoring: Slot ID: ${slot.id}, isAvailable: ${slot.isAvailable}');
+
+      // Zaktualizuj listę filtrowanych slotów i powiadom UI
+      _filterSlotsForDay(_selectedDay ?? _focusedDay);
+      notifyListeners();
+
+      // Zapisz zmiany w SharedPreferences
+      _saveSlotsToPreferences();
+    } else {
+      print('Failed to restore slot $slotId for Doctor ID $doctorId');
+    }
   }
 
   Future<void> _saveSlotsToPreferences() async {
@@ -128,6 +156,11 @@ class SlotViewModel extends ChangeNotifier {
     List<Map<String, dynamic>> slotsJson =
         slots.map((slot) => slot.toJson()).toList();
     await prefs.setString('slots_${_currentDoctorId!}', json.encode(slotsJson));
+
+    print('Saved slots for Doctor ID $_currentDoctorId:');
+    for (var slot in slots) {
+      print('Slot ID: ${slot.id}, isAvailable: ${slot.isAvailable}');
+    }
   }
 
   Future<void> _loadSlotsFromPreferences() async {
@@ -139,23 +172,31 @@ class SlotViewModel extends ChangeNotifier {
       List<dynamic> decoded = json.decode(slotsJson);
       doctorSlots[_currentDoctorId!] =
           decoded.map((data) => Slot.fromJson(data)).toList();
-      print('Załadowane sloty dla lekarza $_currentDoctorId: $decoded');
+
+      print('Loaded slots for Doctor ID $_currentDoctorId:');
+      for (var slot in doctorSlots[_currentDoctorId!]!) {
+        print('Slot ID: ${slot.id}, isAvailable: ${slot.isAvailable}');
+      }
+    } else {
+      print(
+          'No slots found for Doctor ID $_currentDoctorId in SharedPreferences');
     }
+    notifyListeners();
   }
 
   bool _isWeekday(DateTime date) {
     return date.weekday >= DateTime.monday && date.weekday <= DateTime.friday;
   }
 
-  Future<void> saveSlotsToPreferences() async {
-    if (_currentDoctorId == null) return;
+  // Future<void> saveSlotsToPreferences() async {
+  //   if (_currentDoctorId == null) return;
 
-    final slots = doctorSlots[_currentDoctorId];
-    if (slots == null) return;
+  //   final slots = doctorSlots[_currentDoctorId];
+  //   if (slots == null) return;
 
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    List<Map<String, dynamic>> slotsJson =
-        slots.map((slot) => slot.toJson()).toList();
-    await prefs.setString('slots_${_currentDoctorId!}', json.encode(slotsJson));
-  }
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   List<Map<String, dynamic>> slotsJson =
+  //       slots.map((slot) => slot.toJson()).toList();
+  //   await prefs.setString('slots_${_currentDoctorId!}', json.encode(slotsJson));
+  // }
 }

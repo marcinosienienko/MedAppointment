@@ -4,6 +4,9 @@ import 'package:medical_app/presentation/pages/appointments_page.dart';
 import 'package:medical_app/presentation/pages/settings_page.dart';
 import 'package:medical_app/core/theme/app_colors.dart';
 import 'package:medical_app/presentation/pages/profile_page.dart';
+import 'package:provider/provider.dart';
+import 'package:medical_app/data/viewmodels/slot_viewmodel.dart';
+import 'package:medical_app/data/viewmodels/appointments_viewmodel.dart';
 
 class BottomNavigation extends StatefulWidget {
   final int initialPageIndex;
@@ -20,6 +23,12 @@ class _BottomNavigationState extends State<BottomNavigation> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final slotViewModel = Provider.of<SlotViewModel>(context, listen: false);
+      print('SlotViewModel dostępny: ${slotViewModel != null}');
+      Provider.of<AppointmentsViewModel>(context, listen: false)
+          .loadAppointmentsFromPreferences();
+    });
     currentPageIndex = widget.initialPageIndex; // Ustaw domyślny indeks
   }
 

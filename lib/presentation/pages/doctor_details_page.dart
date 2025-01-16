@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:medical_app/data/models/doctor_model.dart';
 import 'package:medical_app/presentation/pages/calendar_page.dart';
 import 'package:medical_app/presentation/widgets/buttons/PrimaryButton.dart';
+import 'package:provider/provider.dart';
+import 'package:medical_app/data/viewmodels/slot_viewmodel.dart';
+import 'package:medical_app/data/viewmodels/appointments_viewmodel.dart';
 
 class DoctorDetailsPage extends StatelessWidget {
   final Doctor doctor;
@@ -78,7 +81,11 @@ class DoctorDetailsPage extends StatelessWidget {
               padding: const EdgeInsets.only(bottom: 30.0),
               child: Center(
                 child: PrimaryButton(
-                  onPressed: () {
+                  onPressed: () async {
+                    final slotViewModel =
+                        Provider.of<SlotViewModel>(context, listen: false);
+                    slotViewModel.setCurrentDoctorId(doctor.id);
+
                     Navigator.push(
                       context,
                       MaterialPageRoute(
