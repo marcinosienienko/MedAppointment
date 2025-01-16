@@ -3,15 +3,17 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:medical_app/data/models/appointment_model.dart';
 import 'package:medical_app/data/viewmodels/slot_viewmodel.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AppointmentsViewModel extends ChangeNotifier {
   final SlotViewModel? slotViewModel;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   List<Appointment> _appointments = [];
   AppointmentsViewModel(this.slotViewModel); // Konstruktor z parametrem
 
   List<Appointment> get appointments => _appointments;
 
-  Future<void> addAppointment(Appointment appointment) async {
+  Future<void> addAppointment(Appointment appointment, String userId) async {
     if (_appointments.any((existing) => existing.id == appointment.id)) {
       print('Wizyta już istnieje: ${appointment.id}');
       return;
@@ -28,6 +30,18 @@ class AppointmentsViewModel extends ChangeNotifier {
     }
 
     await _saveToPreferences();
+
+    // Zapisz w Firestore
+    try {
+      await _firestore
+          .collection('appointments')
+          .doc(appointment.id)
+          .set({...appointment.toJson(), 'userId': userId});
+      print('Wizyta zapisana w Firestore: ${appointment.id}');
+    } catch (e) {
+      print('Błąd zapisu do Firestore: $e');
+    }
+
     notifyListeners();
   }
 
@@ -48,6 +62,7 @@ class AppointmentsViewModel extends ChangeNotifier {
       );
 
       await _saveToPreferences();
+      await _firestore.collection('appointments').doc(id).delete();
       notifyListeners();
     } else {
       print('Nie znaleziono wizyty o ID: $id');

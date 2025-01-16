@@ -2,8 +2,10 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:medical_app/data/models/slot_model.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class SlotViewModel extends ChangeNotifier {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final Map<String, List<Slot>> doctorSlots = {};
   List<Slot> filteredSlots = [];
   String? _currentDoctorId;
@@ -93,7 +95,7 @@ class SlotViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void reserveSlot(String slotId) {
+  Future<void> reserveSlot(String slotId) async {
     if (_currentDoctorId == null) return;
 
     final slots = doctorSlots[_currentDoctorId];
@@ -103,7 +105,18 @@ class SlotViewModel extends ChangeNotifier {
         orElse: () => throw Exception('Slot not found'));
     slot.isAvailable = false;
 
-    _saveSlotsToPreferences(); // Save changes
+    // Zaktualizuj slot w Firestore
+    try {
+      await _firestore
+          .collection('slots')
+          .doc(slotId)
+          .update({'isAvailable': false});
+      print('Slot zaktualizowany w Firestore: $slotId');
+    } catch (e) {
+      print('Błąd aktualizacji slotu w Firestore: $e');
+    }
+
+    await _saveSlotsToPreferences(); // Save changes
     notifyListeners();
   }
 
