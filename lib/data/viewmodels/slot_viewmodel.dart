@@ -125,10 +125,12 @@ class SlotViewModel extends ChangeNotifier {
           .doc(doctorId)
           .collection('slots')
           .doc(slotId)
-          .update({'isAvailable': true});
+          .update({'status': 'available'});
       print('Dostępność slotu przywrócona.');
+      notifyListeners();
     } catch (e) {
       print('Błąd podczas przywracania dostępności slotu: $e');
+      throw e;
     }
   }
 }

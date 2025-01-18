@@ -1,8 +1,6 @@
-import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:convert';
-import 'package:medical_app/data/models/appointment_model.dart';
-import 'package:medical_app/data/services/firestore_service.dart';
 import 'package:flutter/material.dart';
+import '../models/appointment_model.dart';
+import '../services/firestore_service.dart';
 
 class AppointmentsViewModel extends ChangeNotifier {
   final FirestoreService _firestoreService = FirestoreService();
@@ -15,41 +13,22 @@ class AppointmentsViewModel extends ChangeNotifier {
       print('Ładowanie wizyt dla użytkownika: $userId');
       _appointments = await _firestoreService.fetchAppointmentsByUserId(userId);
       print('Załadowano ${_appointments.length} wizyt.');
-      notifyListeners(); // Powiadamia UI o zmianach w danych
+      notifyListeners();
     } catch (e) {
       print('Błąd podczas pobierania wizyt: $e');
     }
   }
 
-  Future<void> loadAppointmentsFromPreferences() async {
+  Future<void> cancelAppointment(
+      String appointmentId, String doctorId, String slotId) async {
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? jsonString = prefs.getString('appointments');
-      if (jsonString != null) {
-        List<dynamic> jsonList = json.decode(jsonString);
-        _appointments =
-            jsonList.map((json) => Appointment.fromJson(json)).toList();
-      }
+      await _firestoreService.cancelAppointment(
+          appointmentId, doctorId, slotId);
+      _appointments
+          .removeWhere((appointment) => appointment.id == appointmentId);
       notifyListeners();
     } catch (e) {
-      print('Błąd podczas ładowania wizyt z pamięci lokalnej: $e');
+      print('Błąd podczas anulowania wizyty: $e');
     }
-  }
-
-  void _saveAppointmentsToPreferences() async {
-    try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String jsonString =
-          json.encode(_appointments.map((a) => a.toJson()).toList());
-      prefs.setString('appointments', jsonString);
-    } catch (e) {
-      print('Błąd podczas zapisywania wizyt do pamięci lokalnej: $e');
-    }
-  }
-
-  void cancelAppointment(String appointmentId) {
-    _appointments.removeWhere((appointment) => appointment.id == appointmentId);
-    _saveAppointmentsToPreferences();
-    notifyListeners();
   }
 }
