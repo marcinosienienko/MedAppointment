@@ -59,42 +59,41 @@ class _AppointmentsPageState extends State<AppointmentsPage> {
         trailing: IconButton(
           icon: Icon(Icons.cancel, color: Colors.red),
           onPressed: () {
-            _showCancelDialog(
-                context, appointment.id, appointment.doctorId ?? '');
+            _cancelAppointment(context, appointment.id,
+                appointment.doctorId ?? '', appointment.slotId ?? '');
           },
         ),
       ),
     );
   }
 
-  void _showCancelDialog(
-      BuildContext context, String appointmentId, String doctorId) {
+  void _cancelAppointment(BuildContext context, String appointmentId,
+      String doctorId, String slotId) {
+    final appointmentsViewModel =
+        Provider.of<AppointmentsViewModel>(context, listen: false);
+
     showDialog(
       context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text('Anuluj wizytę'),
-          content: Text('Czy na pewno chcesz anulować tę wizytę?'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('Anuluj'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Provider.of<SlotViewModel>(context, listen: false)
-                    .restoreSlotAvailability(appointmentId, doctorId);
-                Provider.of<AppointmentsViewModel>(context, listen: false)
-                    .cancelAppointment(appointmentId);
-                Navigator.of(context).pop();
-              },
-              child: Text('Potwierdź'),
-            ),
-          ],
-        );
-      },
+      builder: (context) => AlertDialog(
+        title: const Text('Anuluj wizytę'),
+        content: const Text('Czy na pewno chcesz anulować tę wizytę?'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: const Text('Nie'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              Navigator.of(context).pop();
+              await appointmentsViewModel.cancelAppointment(
+                  appointmentId, doctorId, slotId);
+            },
+            child: const Text('Tak'),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:medical_app/presentation/pages/dashboard_page.dart';
 import 'package:medical_app/presentation/pages/appointments_page.dart';
-import 'package:medical_app/presentation/pages/settings_page.dart';
 import 'package:medical_app/core/theme/app_colors.dart';
 import 'package:medical_app/presentation/pages/profile_page.dart';
 import 'package:provider/provider.dart';
 import 'package:medical_app/data/viewmodels/appointments_viewmodel.dart';
+import 'package:medical_app/data/viewmodels/user_viewmodel.dart';
 
 class BottomNavigation extends StatefulWidget {
   final int initialPageIndex;
@@ -22,11 +22,7 @@ class _BottomNavigationState extends State<BottomNavigation> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<AppointmentsViewModel>(context, listen: false)
-          .loadAppointmentsFromPreferences();
-    });
-    currentPageIndex = widget.initialPageIndex; // Ustaw domyślny indeks
+    currentPageIndex = widget.initialPageIndex;
   }
 
   final List<Widget> _pages = [
@@ -37,10 +33,23 @@ class _BottomNavigationState extends State<BottomNavigation> {
 
   @override
   Widget build(BuildContext context) {
+    final appointmentsViewModel =
+        Provider.of<AppointmentsViewModel>(context, listen: false);
+    final userViewModel = Provider.of<UserViewModel>(context, listen: false);
+
     return Scaffold(
-      body: _pages[currentPageIndex],
+      body: IndexedStack(
+        index: currentPageIndex,
+        children: _pages,
+      ),
       bottomNavigationBar: NavigationBar(
-        onDestinationSelected: (int index) {
+        onDestinationSelected: (int index) async {
+          if (index == 1) {
+            // Zakładka "Wizyty"
+            final userId = userViewModel.currentUser?.id ?? '';
+            await appointmentsViewModel.fetchAppointments(userId);
+          }
+
           setState(() {
             currentPageIndex = index;
           });

@@ -137,6 +137,29 @@ class FirestoreService {
     );
   }
 
+  Future<void> cancelAppointment(
+      String appointmentId, String doctorId, String slotId) async {
+    try {
+      print('Anulowanie wizyty: $appointmentId');
+
+      // Usuń wizytę
+      await _db.collection('appointments').doc(appointmentId).delete();
+      print('Wizyta została usunięta.');
+
+      // Przywróć dostępność slotu
+      await _db
+          .collection('doctors')
+          .doc(doctorId)
+          .collection('slots')
+          .doc(slotId)
+          .update({'status': 'available'});
+      print('Dostępność slotu została przywrócona.');
+    } catch (e) {
+      print('Błąd podczas anulowania wizyty: $e');
+      throw e;
+    }
+  }
+
   Future<Specialization?> fetchSpecialization(String specializationId) async {
     try {
       print('Pobieranie specjalizacji o ID: $specializationId');
