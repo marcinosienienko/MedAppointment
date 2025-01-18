@@ -18,18 +18,20 @@ class MainSearchBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextField(
       controller: searchController,
+      style: const TextStyle(color: Colors.black),
       decoration: InputDecoration(
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8.0),
-          borderSide: BorderSide(color: Colors.blue),
+          borderSide: const BorderSide(color: Colors.blue),
         ),
-        prefixIcon: currentText.isNotEmpty
-            ? null
-            : const Icon(Icons.search, color: Colors.grey),
+        prefixIcon: const Icon(Icons.search, color: Colors.grey),
         suffixIcon: currentText.isNotEmpty
             ? IconButton(
                 icon: const Icon(Icons.clear),
-                onPressed: onClear,
+                onPressed: () {
+                  onClear();
+                  searchController.clear(); // Wyczyszczenie pola tekstowego
+                },
               )
             : null,
         hintText: 'Wyszukaj lekarza',
@@ -37,12 +39,10 @@ class MainSearchBar extends StatelessWidget {
         fillColor: Colors.white,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8.0),
-          borderSide: BorderSide(color: Colors.grey),
+          borderSide: const BorderSide(color: Colors.grey),
         ),
-        contentPadding: currentText.isNotEmpty
-            ? const EdgeInsets.symmetric(vertical: 15.0, horizontal: 16.0)
-            : const EdgeInsets.only(
-                left: 48.0, right: 16.0, top: 15.0, bottom: 15.0),
+        contentPadding:
+            const EdgeInsets.symmetric(vertical: 15.0, horizontal: 16.0),
       ),
       onChanged: onChanged,
     );

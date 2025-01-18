@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:medical_app/data/viewmodels/auth_view_model.dart';
 import 'package:medical_app/data/viewmodels/user_viewmodel.dart';
-import 'package:medical_app/presentation/widgets/buttons/PrimaryButton.dart';
+import 'package:medical_app/presentation/widgets/buttons/primary_button.dart';
 import 'package:medical_app/presentation/widgets/inputs/name_input.dart';
 import 'package:medical_app/presentation/widgets/inputs/phone_number_input.dart';
 import 'package:medical_app/presentation/widgets/inputs/base_input.dart';

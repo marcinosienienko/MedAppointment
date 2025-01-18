@@ -5,7 +5,6 @@ import 'package:medical_app/presentation/pages/settings_page.dart';
 import 'package:medical_app/core/theme/app_colors.dart';
 import 'package:medical_app/presentation/pages/profile_page.dart';
 import 'package:provider/provider.dart';
-import 'package:medical_app/data/viewmodels/slot_viewmodel.dart';
 import 'package:medical_app/data/viewmodels/appointments_viewmodel.dart';
 
 class BottomNavigation extends StatefulWidget {
@@ -24,25 +23,16 @@ class _BottomNavigationState extends State<BottomNavigation> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final slotViewModel = Provider.of<SlotViewModel>(context, listen: false);
-      print('SlotViewModel dostępny: ${slotViewModel != null}');
       Provider.of<AppointmentsViewModel>(context, listen: false)
           .loadAppointmentsFromPreferences();
     });
     currentPageIndex = widget.initialPageIndex; // Ustaw domyślny indeks
   }
 
-  void navigateToPage(int index) {
-    setState(() {
-      currentPageIndex = index;
-    });
-  }
-
   final List<Widget> _pages = [
-    const DashboardPage(),
-    AppointmentsPage(),
-    // const SettingsPage(),
-    const ProfilePage(),
+    const DashboardPage(), // Dashboard
+    AppointmentsPage(), // Wizyty
+    const ProfilePage(), // Profil
   ];
 
   @override
@@ -69,11 +59,6 @@ class _BottomNavigationState extends State<BottomNavigation> {
             icon: Icon(Icons.calendar_month_outlined),
             label: 'Wizyty',
           ),
-          // NavigationDestination(
-          //   selectedIcon: Icon(Icons.settings),
-          //   icon: Icon(Icons.settings_outlined),
-          //   label: 'Ustawienia',
-          // ),
           NavigationDestination(
             selectedIcon: Icon(Icons.person),
             icon: Icon(Icons.person_outlined),

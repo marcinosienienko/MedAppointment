@@ -2,12 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:medical_app/data/viewmodels/slot_viewmodel.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'package:medical_app/presentation/widgets/buttons/PrimaryButton.dart';
+import 'package:medical_app/presentation/widgets/buttons/primary_button.dart';
 import 'package:medical_app/data/viewmodels/appointments_viewmodel.dart';
-import 'package:medical_app/data/models/appointment_model.dart';
-import 'package:medical_app/data/viewmodels/doctor_viewmodel.dart';
-import 'package:medical_app/presentation/widgets/navigation_bar.dart';
-import 'package:medical_app/data/models/slot_model.dart';
 import 'package:medical_app/data/viewmodels/user_viewmodel.dart';
 
 class CalendarPage extends StatefulWidget {
@@ -23,7 +19,6 @@ class _CalendarPageState extends State<CalendarPage> {
   @override
   void initState() {
     super.initState();
-    // Ustawienie aktualnego ID lekarza i inicjalizacja slotów
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final slotViewModel = Provider.of<SlotViewModel>(context, listen: false);
       slotViewModel.setCurrentDoctorId(widget.doctorId);
@@ -33,11 +28,9 @@ class _CalendarPageState extends State<CalendarPage> {
   @override
   Widget build(BuildContext context) {
     final slotViewModel = Provider.of<SlotViewModel>(context);
-    final doctorViewModel = Provider.of<DoctorsViewModel>(context);
-    final appointmentsViewModel =
-        Provider.of<AppointmentsViewModel>(context, listen: false);
-    final userViewModel = Provider.of<UserViewModel>(context, listen: false);
-    final userId = userViewModel.currentUser?.id ?? '';
+    final userId =
+        Provider.of<UserViewModel>(context, listen: false).currentUser?.id ??
+            '';
 
     return Scaffold(
       appBar: AppBar(
@@ -48,6 +41,23 @@ class _CalendarPageState extends State<CalendarPage> {
           // Kalendarz
           TableCalendar(
             locale: "pl_PL",
+            weekendDays: [DateTime.saturday, DateTime.sunday],
+            startingDayOfWeek: StartingDayOfWeek.monday,
+            calendarStyle: CalendarStyle(
+              outsideDaysVisible: false,
+              selectedDecoration: BoxDecoration(
+                color: Colors.blue,
+                shape: BoxShape.circle,
+              ),
+              defaultDecoration: BoxDecoration(
+                color: Colors.grey[200],
+                shape: BoxShape.circle,
+              ),
+              todayDecoration: BoxDecoration(
+                color: Colors.blue[100],
+                shape: BoxShape.circle,
+              ),
+            ),
             firstDay: DateTime.now(),
             lastDay: DateTime.now().add(Duration(days: 30)),
             focusedDay: slotViewModel.focusedDay,
@@ -62,104 +72,110 @@ class _CalendarPageState extends State<CalendarPage> {
                 HeaderStyle(titleCentered: true, formatButtonVisible: false),
           ),
 
-          // Siatka slotów
+          // Sloty
           Expanded(
-            child: GridView.builder(
-              padding: const EdgeInsets.all(16.0),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 6, // Liczba kolumn
-                crossAxisSpacing: 8.0,
-                mainAxisSpacing: 4.0,
-              ),
-              itemCount: slotViewModel.slots.length,
-              itemBuilder: (context, index) {
-                final slot = slotViewModel.slots[index];
-                final isSelected = slotViewModel.selectedSlot == slot;
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 300),
+              child: slotViewModel.slots.isNotEmpty
+                  ? GridView.builder(
+                      key: ValueKey(slotViewModel.slots),
+                      padding: const EdgeInsets.all(16.0),
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 6,
+                        crossAxisSpacing: 10.0,
+                        mainAxisSpacing: 10.0,
+                      ),
+                      itemCount: slotViewModel.slots.length,
+                      itemBuilder: (context, index) {
+                        final slot = slotViewModel.slots[index];
+                        final isSelected = slotViewModel.selectedSlot == slot;
 
-                return GestureDetector(
-                  onTap: slot.isAvailable
-                      ? () {
-                          slotViewModel.selectSlot(slot);
-                        }
-                      : null,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: isSelected
-                          ? Colors.blue
-                          : (slot.isAvailable
-                              ? Colors.grey[400]
-                              : Colors.red[200]),
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                    alignment: Alignment.center,
-                    child: Text(
-                      '${slot.dateTime.hour.toString().padLeft(2, '0')}:${slot.dateTime.minute.toString().padLeft(2, '0')}',
-                      style: TextStyle(
-                        color: isSelected ? Colors.white : Colors.grey[700],
+                        return GestureDetector(
+                          onTap: slot.isAvailable
+                              ? () {
+                                  slotViewModel.selectSlot(slot);
+                                }
+                              : null,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: isSelected
+                                  ? Colors.blue
+                                  : (slot.isAvailable
+                                      ? Colors.grey[300]
+                                      : Colors.red[200]),
+                              borderRadius: BorderRadius.circular(12.0),
+                            ),
+                            alignment: Alignment.center,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  '${slot.startTime.toString().padLeft(2, '0')}',
+                                  style: TextStyle(
+                                    color: isSelected
+                                        ? Colors.white
+                                        : Colors.black,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                if (!slot.isAvailable)
+                                  Text(
+                                    'Zajęty',
+                                    style: TextStyle(
+                                      color: Colors.red[800],
+                                      fontSize: 12.0,
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    )
+                  : Center(
+                      child: Text(
+                        'Brak dostępnych slotów na ten dzień',
+                        style: TextStyle(
+                          fontSize: 16.0,
+                          color: Colors.grey[700],
+                        ),
                       ),
                     ),
-                  ),
-                );
-              },
             ),
           ),
-
-          // Przycisk "Zarezerwuj wizytę"
           Padding(
             padding:
-                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
             child: PrimaryButton(
               text: 'Zarezerwuj wizytę',
-              onPressed: () {
-                if (slotViewModel.selectedSlot != null) {
-                  _showAppointmentConfirmation(
-                    context,
-                    slotViewModel.selectedSlot!,
-                    () async {
-                      // Utwórz nową wizytę
-                      final appointment = Appointment(
-                        id: slotViewModel.selectedSlot!.id,
-                        slotId: slotViewModel.selectedSlot!.id,
-                        doctorId: widget.doctorId,
-                        doctorName: doctorViewModel
-                            .getDoctorById(widget.doctorId)!
-                            .name,
-                        specialization: doctorViewModel
-                            .getDoctorById(widget.doctorId)!
-                            .specialization,
-                        dateTime: slotViewModel.selectedSlot!.dateTime,
-                      );
-
-                      // Dodaj wizytę i zarezerwuj slot
-                      await appointmentsViewModel.addAppointment(
-                          appointment, userId);
-                      await slotViewModel
-                          .reserveSlot(slotViewModel.selectedSlot!.id);
-
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Wizyta zarezerwowana'),
-                          duration: Duration(milliseconds: 1000),
-                        ),
-                      );
-
-                      // Przejdź do ekranu z listą wizyt
-                      Navigator.of(context).pushAndRemoveUntil(
-                        MaterialPageRoute(
-                          builder: (context) => BottomNavigation(
-                            initialPageIndex: 1,
-                          ),
-                        ),
-                        (Route<dynamic> route) => false,
-                      );
-                    },
+              onPressed: () async {
+                final selectedSlot = slotViewModel.selectedSlot;
+                if (selectedSlot == null) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Wybierz slot przed rezerwacją.')),
                   );
+                  return;
+                }
+
+                final success = await slotViewModel.reserveSlot(
+                  selectedSlot.id,
+                  widget.doctorId,
+                  userId,
+                );
+
+                if (success) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Wizyta zarezerwowana!')),
+                  );
+
+                  // Opcjonalne odświeżenie ekranu z wizytami
+                  Provider.of<AppointmentsViewModel>(context, listen: false)
+                      .fetchAppointments(userId);
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Wybierz termin wizyty'),
-                      duration: Duration(milliseconds: 1000),
-                    ),
+                    SnackBar(
+                        content: Text('Nie udało się zarezerwować wizyty.')),
                   );
                 }
               },
@@ -170,31 +186,9 @@ class _CalendarPageState extends State<CalendarPage> {
     );
   }
 
-  void _showAppointmentConfirmation(
-      BuildContext context, Slot slot, VoidCallback onConfirm) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Czy na pewno chcesz zarezerwować wizytę?'),
-        content: Text(
-          'W dniu ${slot.dateTime.day}.${slot.dateTime.month}.${slot.dateTime.year} o ${slot.dateTime.hour}:${slot.dateTime.minute}',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            child: const Text('Anuluj'),
-          ),
-          TextButton(
-            onPressed: () {
-              onConfirm();
-              Navigator.of(context).pop();
-            },
-            child: const Text('Zarezerwuj'),
-          ),
-        ],
-      ),
-    );
+  bool isSameDay(DateTime date1, DateTime date2) {
+    return date1.year == date2.year &&
+        date1.month == date2.month &&
+        date1.day == date2.day;
   }
 }

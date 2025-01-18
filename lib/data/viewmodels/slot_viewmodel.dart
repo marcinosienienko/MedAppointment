@@ -1,86 +1,38 @@
-import 'dart:convert';
-import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:medical_app/data/models/slot_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
+import '../models/slot_model.dart';
 
 class SlotViewModel extends ChangeNotifier {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final Map<String, List<Slot>> doctorSlots = {};
-  List<Slot> filteredSlots = [];
-  String? _currentDoctorId;
-  Slot? _selectedSlot;
+  List<Slot> _allSlots = [];
+  List<Slot> _filteredSlots = [];
+  DateTime _selectedDay = DateTime.now();
   DateTime _focusedDay = DateTime.now();
-  DateTime? _selectedDay;
+  Slot? _selectedSlot;
 
-  List<Slot> get slots => filteredSlots;
-  Slot? get selectedSlot => _selectedSlot;
+  List<Slot> get slots => _filteredSlots;
+  DateTime get selectedDay => _selectedDay;
   DateTime get focusedDay => _focusedDay;
-  DateTime? get selectedDay => _selectedDay;
+  Slot? get selectedSlot => _selectedSlot;
 
-  void setCurrentDoctorId(String doctorId) async {
-    _currentDoctorId = doctorId;
+  final FirebaseFirestore _db = FirebaseFirestore.instance;
 
-    if (!doctorSlots.containsKey(doctorId)) {
-      _generateMockSlots(doctorId);
-    }
-
-    // Load slots state from preferences
-    await _loadSlotsFromPreferences();
-
-    _filterSlotsForDay(DateTime.now());
+  void setSlots(List<Slot> slots) {
+    _allSlots = slots;
+    _filterSlotsBySelectedDay();
   }
 
-  void _generateMockSlots(String doctorId) {
-    if (doctorSlots.containsKey(doctorId)) return;
-
-    final List<Slot> slots = [];
-    final now = DateTime.now();
-    final startHour = 8;
-    final endHour = 16;
-
-    for (var i = 0; i < 30; i++) {
-      final date = now.add(Duration(days: i));
-      if (_isWeekday(date)) {
-        for (var hour = startHour; hour < endHour; hour++) {
-          for (var minute = 0; minute < 60; minute += 15) {
-            slots.add(
-              Slot(
-                id: '${doctorId}_${date.toIso8601String()}_${hour}_${minute}',
-                dateTime:
-                    DateTime(date.year, date.month, date.day, hour, minute),
-                doctorId: doctorId,
-                isAvailable: true,
-              ),
-            );
-          }
-        }
-      }
-    }
-
-    doctorSlots[doctorId] = slots;
+  void onDaySelected(DateTime selectedDay, DateTime focusedDay) {
+    _selectedDay = selectedDay;
+    _focusedDay = focusedDay;
+    _filterSlotsBySelectedDay();
     notifyListeners();
   }
 
-  void _filterSlotsForDay(DateTime selectedDay) {
-    if (_currentDoctorId == null ||
-        !doctorSlots.containsKey(_currentDoctorId)) {
-      filteredSlots = [];
-      print('Filtered slots: [] (no doctor ID or no slots)');
-      return;
-    }
-
-    final allSlotsForDoctor = doctorSlots[_currentDoctorId]!;
-
-    filteredSlots = allSlotsForDoctor.where((slot) {
-      return slot.dateTime.year == selectedDay.year &&
-          slot.dateTime.month == selectedDay.month &&
-          slot.dateTime.day == selectedDay.day;
+  void _filterSlotsBySelectedDay() {
+    _filteredSlots = _allSlots.where((slot) {
+      DateTime slotDate = DateTime.parse(slot.date);
+      return isSameDay(slotDate, _selectedDay);
     }).toList();
-
-    print(
-        'Filtered slots for day $selectedDay: ${filteredSlots.map((s) => s.id).toList()}');
-    notifyListeners();
   }
 
   void selectSlot(Slot slot) {
@@ -88,128 +40,95 @@ class SlotViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void onDaySelected(DateTime selectedDay, DateTime focusedDay) {
-    _selectedDay = selectedDay;
-    _focusedDay = focusedDay;
-    _filterSlotsForDay(selectedDay);
-    notifyListeners();
-  }
-
-  Future<void> reserveSlot(String slotId) async {
-    if (_currentDoctorId == null) return;
-
-    final slots = doctorSlots[_currentDoctorId];
-    if (slots == null) return;
-
-    final slot = slots.firstWhere((slot) => slot.id == slotId,
-        orElse: () => throw Exception('Slot not found'));
-    slot.isAvailable = false;
-
-    // Zaktualizuj slot w Firestore
+  Future<bool> reserveSlot(
+      String slotId, String doctorId, String userId) async {
     try {
-      await _firestore
+      print('Rozpoczęto rezerwację slotu: $slotId');
+
+      // Aktualizacja slotu w Firestore
+      await _db
+          .collection('doctors')
+          .doc(doctorId)
           .collection('slots')
           .doc(slotId)
-          .update({'isAvailable': false});
-      print('Slot zaktualizowany w Firestore: $slotId');
-    } catch (e) {
-      print('Błąd aktualizacji slotu w Firestore: $e');
-    }
+          .update({'status': 'booked'});
 
-    await _saveSlotsToPreferences(); // Save changes
-    notifyListeners();
-  }
+      print('Zaktualizowano status slotu.');
 
-  void restoreSlotAvailability(String slotId, String doctorId) {
-    if (!doctorSlots.containsKey(doctorId)) {
-      print('Doctor ID $doctorId not found in doctorSlots');
-      return;
-    }
+      // Dodanie wizyty do Firestore
+      final appointment = {
+        'doctorId': doctorId,
+        'userId': userId,
+        'slotId': slotId,
+        'dateTime': DateTime.now().toIso8601String(), // Przykładowa data
+        'status': 'booked',
+      };
 
-    final slots = doctorSlots[doctorId];
-    if (slots == null) {
-      print('No slots found for Doctor ID $doctorId');
-      return;
-    }
+      await _db.collection('appointments').add(appointment);
+      print('Dodano wizytę do kolekcji appointments.');
 
-    final slot = slots.firstWhere(
-      (slot) => slot.id == slotId,
-      orElse: () {
-        print('Slot ID $slotId not found for Doctor ID $doctorId');
-        return Slot(
-            id: '', dateTime: DateTime.now(), doctorId: '', isAvailable: true);
-      },
-    );
+      // Lokalna aktualizacja slotów
+      _allSlots = _allSlots.map((slot) {
+        if (slot.id == slotId) {
+          return slot.copyWith(status: 'available');
+        }
+        return slot;
+      }).toList();
 
-    if (slot.id.isNotEmpty) {
-      print(
-          'Before restoring: Slot ID: ${slot.id}, isAvailable: ${slot.isAvailable}');
-      slot.isAvailable = true;
-      print(
-          'After restoring: Slot ID: ${slot.id}, isAvailable: ${slot.isAvailable}');
-
-      // Zaktualizuj listę filtrowanych slotów i powiadom UI
-      _filterSlotsForDay(_selectedDay ?? _focusedDay);
+      _filterSlotsBySelectedDay();
       notifyListeners();
 
-      // Zapisz zmiany w SharedPreferences
-      _saveSlotsToPreferences();
-    } else {
-      print('Failed to restore slot $slotId for Doctor ID $doctorId');
+      return true;
+    } catch (e) {
+      print('Błąd podczas rezerwacji slotu: $e');
+      return false;
     }
   }
 
-  Future<void> _saveSlotsToPreferences() async {
-    if (_currentDoctorId == null) return;
-
-    final slots = doctorSlots[_currentDoctorId];
-    if (slots == null) return;
-
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    List<Map<String, dynamic>> slotsJson =
-        slots.map((slot) => slot.toJson()).toList();
-    await prefs.setString('slots_${_currentDoctorId!}', json.encode(slotsJson));
-
-    print('Saved slots for Doctor ID $_currentDoctorId:');
-    for (var slot in slots) {
-      print('Slot ID: ${slot.id}, isAvailable: ${slot.isAvailable}');
+  Future<void> setCurrentDoctorId(String doctorId) async {
+    try {
+      final slots = await fetchSlotsByDoctorId(doctorId);
+      setSlots(slots);
+    } catch (e) {
+      print('Błąd podczas pobierania slotów: $e');
     }
   }
 
-  Future<void> _loadSlotsFromPreferences() async {
-    if (_currentDoctorId == null) return;
+  Future<List<Slot>> fetchSlotsByDoctorId(String doctorId) async {
+    try {
+      final snapshot = await _db
+          .collection('doctors')
+          .doc(doctorId)
+          .collection('slots')
+          .get();
 
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? slotsJson = prefs.getString('slots_${_currentDoctorId!}');
-    if (slotsJson != null) {
-      List<dynamic> decoded = json.decode(slotsJson);
-      doctorSlots[_currentDoctorId!] =
-          decoded.map((data) => Slot.fromJson(data)).toList();
-
-      print('Loaded slots for Doctor ID $_currentDoctorId:');
-      for (var slot in doctorSlots[_currentDoctorId!]!) {
-        print('Slot ID: ${slot.id}, isAvailable: ${slot.isAvailable}');
-      }
-    } else {
-      print(
-          'No slots found for Doctor ID $_currentDoctorId in SharedPreferences');
+      return snapshot.docs
+          .map((doc) => Slot.fromMap(doc.data(), doc.id))
+          .toList();
+    } catch (e) {
+      print('Błąd podczas pobierania slotów: $e');
+      return [];
     }
-    notifyListeners();
   }
 
-  bool _isWeekday(DateTime date) {
-    return date.weekday >= DateTime.monday && date.weekday <= DateTime.friday;
+  bool isSameDay(DateTime date1, DateTime date2) {
+    return date1.year == date2.year &&
+        date1.month == date2.month &&
+        date1.day == date2.day;
   }
 
-  // Future<void> saveSlotsToPreferences() async {
-  //   if (_currentDoctorId == null) return;
-
-  //   final slots = doctorSlots[_currentDoctorId];
-  //   if (slots == null) return;
-
-  //   SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   List<Map<String, dynamic>> slotsJson =
-  //       slots.map((slot) => slot.toJson()).toList();
-  //   await prefs.setString('slots_${_currentDoctorId!}', json.encode(slotsJson));
-  // }
+  Future<void> restoreSlotAvailability(String slotId, String doctorId) async {
+    try {
+      print('Przywracanie dostępności slotu: $slotId dla lekarza: $doctorId');
+      await _db
+          .collection('doctors')
+          .doc(doctorId)
+          .collection('slots')
+          .doc(slotId)
+          .update({'isAvailable': true});
+      print('Dostępność slotu przywrócona.');
+    } catch (e) {
+      print('Błąd podczas przywracania dostępności slotu: $e');
+    }
+  }
 }

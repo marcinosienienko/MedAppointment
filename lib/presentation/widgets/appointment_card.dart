@@ -5,31 +5,57 @@ class AppointmentCard extends StatelessWidget {
   final Appointment appointment;
   final VoidCallback onCancel;
 
-  AppointmentCard({required this.appointment, required this.onCancel});
+  const AppointmentCard({
+    Key? key,
+    required this.appointment,
+    required this.onCancel,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    DateTime? appointmentDate;
+    if (appointment.date != null) {
+      try {
+        appointmentDate = DateTime.parse(appointment.date!);
+      } catch (e) {
+        print('Błąd konwersji daty: $e');
+      }
+    }
+
     return Card(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12.0),
       ),
       elevation: 3,
-      margin: EdgeInsets.symmetric(vertical: 8.0),
+      margin: const EdgeInsets.symmetric(vertical: 8.0),
       child: ListTile(
-        title: Text(appointment.doctorName,
-            style: TextStyle(fontWeight: FontWeight.bold)),
+        leading: CircleAvatar(
+          radius: 24,
+          backgroundImage: const AssetImage('assets/images/default_avatar.png'),
+          backgroundColor: Colors.blueAccent, // Domyślne tło avatara
+        ),
+        title: Text(
+          appointment.doctorName ?? 'Nieznany lekarz', // Wyświetla imię doktora
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Specjalizacja: ${appointment.specialization}'),
             Text(
-              'Termin: ${appointment.dateTime.toLocal()}',
-              style: TextStyle(color: Colors.grey),
+              'Specjalizacja: ${appointment.specialization ?? 'Brak specjalizacji'}',
+              style: const TextStyle(color: Colors.black54),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'Termin: ${appointmentDate != null ? appointmentDate.toLocal() : 'Brak terminu'}',
+              style: const TextStyle(color: Colors.grey),
             ),
           ],
         ),
         trailing: IconButton(
-          icon: Icon(Icons.cancel, color: Colors.red),
+          icon: const Icon(Icons.cancel, color: Colors.red),
           onPressed: onCancel,
         ),
       ),
