@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:medical_app/data/models/doctor_model.dart';
+import 'package:medical_app/data/models/doctor.dart';
 import 'package:medical_app/presentation/pages/calendar_page.dart';
-import 'package:medical_app/presentation/widgets/buttons/PrimaryButton.dart';
+import 'package:medical_app/presentation/widgets/buttons/primary_button.dart';
 import 'package:provider/provider.dart';
 import 'package:medical_app/data/viewmodels/slot_viewmodel.dart';
-import 'package:medical_app/data/viewmodels/appointments_viewmodel.dart';
 
 class DoctorDetailsPage extends StatelessWidget {
   final Doctor doctor;
@@ -52,7 +51,7 @@ class DoctorDetailsPage extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              'Specjalizacja: ${doctor.specialization}',
+              'Specjalizacja: ${doctor.specialization?.name ?? 'Brak informacji'}',
               style: const TextStyle(fontSize: 18),
             ),
             const SizedBox(height: 16),
@@ -78,7 +77,7 @@ class DoctorDetailsPage extends StatelessWidget {
 
             // Przycisk "Umów wizytę"
             Padding(
-              padding: const EdgeInsets.only(bottom: 30.0),
+              padding: const EdgeInsets.only(bottom: 80.0),
               child: Center(
                 child: PrimaryButton(
                   onPressed: () async {

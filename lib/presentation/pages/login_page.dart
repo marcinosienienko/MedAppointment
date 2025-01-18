@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:medical_app/presentation/widgets/buttons/PrimaryButton.dart';
+import 'package:medical_app/presentation/widgets/buttons/primary_button.dart';
 import 'package:medical_app/presentation/widgets/inputs/email_input.dart';
 import 'package:medical_app/presentation/widgets/inputs/password_input.dart';
 import 'package:medical_app/data/viewmodels/login_page_viewmodel.dart';

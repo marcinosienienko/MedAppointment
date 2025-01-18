@@ -1,31 +1,52 @@
 class Slot {
   final String id;
-  final DateTime dateTime;
-  final String doctorId;
-  bool isAvailable;
+  final String date;
+  final String startTime;
+  final String endTime;
+  final String status;
 
   Slot({
     required this.id,
-    required this.dateTime,
-    required this.doctorId,
-    required this.isAvailable,
+    required this.date,
+    required this.startTime,
+    required this.endTime,
+    required this.status,
   });
 
-  // Konwersja na JSON
-  Map<String, dynamic> toJson() => {
-        'id': id,
-        'dateTime': dateTime.toIso8601String(),
-        'doctorId': doctorId,
-        'isAvailable': isAvailable,
-      };
-
-  // Tworzenie obiektu Slot z JSON
-  factory Slot.fromJson(Map<String, dynamic> json) {
+  factory Slot.fromMap(Map<String, dynamic> data, String documentId) {
     return Slot(
-      id: json['id'],
-      dateTime: DateTime.parse(json['dateTime']),
-      doctorId: json['doctorId'],
-      isAvailable: json['isAvailable'],
+      id: documentId,
+      date: data['date'] ?? 'Brak daty',
+      startTime: data['startTime'] ?? 'Brak godziny rozpoczęcia',
+      endTime: data['endTime'] ?? 'Brak godziny zakończenia',
+      status: data['status'] ?? 'Brak statusu',
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'date': date,
+      'startTime': startTime,
+      'endTime': endTime,
+      'status': status,
+    };
+  }
+
+  bool get isAvailable => status == 'available';
+
+  Slot copyWith({
+    String? id,
+    String? date,
+    String? startTime,
+    String? endTime,
+    String? status,
+  }) {
+    return Slot(
+      id: id ?? this.id,
+      date: date ?? this.date,
+      startTime: startTime ?? this.startTime,
+      endTime: endTime ?? this.endTime,
+      status: status ?? this.status,
     );
   }
 }

@@ -1,99 +1,55 @@
-import 'dart:convert';
-import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
 import 'package:medical_app/data/models/appointment_model.dart';
-import 'package:medical_app/data/viewmodels/slot_viewmodel.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:medical_app/data/services/firestore_service.dart';
+import 'package:flutter/material.dart';
 
 class AppointmentsViewModel extends ChangeNotifier {
-  final SlotViewModel? slotViewModel;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirestoreService _firestoreService = FirestoreService();
   List<Appointment> _appointments = [];
-  AppointmentsViewModel(this.slotViewModel); // Konstruktor z parametrem
 
   List<Appointment> get appointments => _appointments;
 
-  Future<void> addAppointment(Appointment appointment, String userId) async {
-    if (_appointments.any((existing) => existing.id == appointment.id)) {
-      print('Wizyta już istnieje: ${appointment.id}');
-      return;
-    }
-
-    _appointments.add(appointment);
-    print('Dodano wizytę: ${appointment.toJson()}');
-
-    // Upewnij się, że slot jest zarezerwowany
-    if (slotViewModel != null) {
-      slotViewModel!.reserveSlot(appointment.slotId);
-    } else {
-      print('SlotViewModel jest niedostępny!');
-    }
-
-    await _saveToPreferences();
-
-    // Zapisz w Firestore
+  Future<void> fetchAppointments(String userId) async {
     try {
-      await _firestore
-          .collection('appointments')
-          .doc(appointment.id)
-          .set({...appointment.toJson(), 'userId': userId});
-      print('Wizyta zapisana w Firestore: ${appointment.id}');
+      print('Ładowanie wizyt dla użytkownika: $userId');
+      _appointments = await _firestoreService.fetchAppointmentsByUserId(userId);
+      print('Załadowano ${_appointments.length} wizyt.');
+      notifyListeners(); // Powiadamia UI o zmianach w danych
     } catch (e) {
-      print('Błąd zapisu do Firestore: $e');
-    }
-
-    notifyListeners();
-  }
-
-  Future<void> cancelAppointment(String id) async {
-    final appointment = _appointments.firstWhere(
-      (appointment) => appointment.id == id,
-      orElse: () => throw Exception('Appointment not found'),
-    );
-
-    if (appointment != null) {
-      _appointments.remove(appointment);
-      print('Anulowano wizytę: $id');
-
-      // Odblokuj slot
-      slotViewModel?.restoreSlotAvailability(
-        appointment.slotId,
-        appointment.doctorId,
-      );
-
-      await _saveToPreferences();
-      await _firestore.collection('appointments').doc(id).delete();
-      notifyListeners();
-    } else {
-      print('Nie znaleziono wizyty o ID: $id');
+      print('Błąd podczas pobierania wizyt: $e');
     }
   }
 
   Future<void> loadAppointmentsFromPreferences() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? appointmentsJson = prefs.getString('appointments');
-    if (appointmentsJson != null && appointmentsJson.isNotEmpty) {
-      List<dynamic> decoded = json.decode(appointmentsJson);
-      _appointments =
-          decoded.map((data) => Appointment.fromJson(data)).toList();
-
-      // Aktualizuj stan slotów
-      for (var appointment in _appointments) {
-        slotViewModel?.reserveSlot(appointment.slotId);
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? jsonString = prefs.getString('appointments');
+      if (jsonString != null) {
+        List<dynamic> jsonList = json.decode(jsonString);
+        _appointments =
+            jsonList.map((json) => Appointment.fromJson(json)).toList();
       }
-
-      print('Załadowane wizyty: $_appointments');
-    } else {
-      _appointments = [];
-      print('Brak zapisanych wizyt w SharedPreferences');
+      notifyListeners();
+    } catch (e) {
+      print('Błąd podczas ładowania wizyt z pamięci lokalnej: $e');
     }
-    notifyListeners();
   }
 
-  Future<void> _saveToPreferences() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    List<Map<String, dynamic>> appointmentsJson =
-        _appointments.map((appointment) => appointment.toJson()).toList();
-    await prefs.setString('appointments', json.encode(appointmentsJson));
+  void _saveAppointmentsToPreferences() async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String jsonString =
+          json.encode(_appointments.map((a) => a.toJson()).toList());
+      prefs.setString('appointments', jsonString);
+    } catch (e) {
+      print('Błąd podczas zapisywania wizyt do pamięci lokalnej: $e');
+    }
+  }
+
+  void cancelAppointment(String appointmentId) {
+    _appointments.removeWhere((appointment) => appointment.id == appointmentId);
+    _saveAppointmentsToPreferences();
+    notifyListeners();
   }
 }

@@ -4,7 +4,6 @@ import 'package:medical_app/data/viewmodels/doctor_viewmodel.dart';
 import 'package:medical_app/data/viewmodels/slot_viewmodel.dart';
 import 'package:medical_app/firebase_options.dart';
 import 'package:provider/provider.dart';
-import 'package:medical_app/data/viewmodels/appointments_viewmodel.dart';
 import 'package:medical_app/presentation/pages/login_page.dart';
 import 'package:medical_app/presentation/pages/profile_page.dart';
 import 'package:medical_app/presentation/pages/register_page.dart';
@@ -16,6 +15,7 @@ import 'package:medical_app/data/viewmodels/login_page_viewmodel.dart';
 import 'package:medical_app/data/viewmodels/auth_view_model.dart';
 import 'package:medical_app/presentation/pages/dashboard_page.dart';
 import 'package:medical_app/data/viewmodels/user_viewmodel.dart';
+import 'package:medical_app/data/viewmodels/appointments_viewmodel.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,17 +28,19 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => SlotViewModel()),
-        ChangeNotifierProxyProvider<SlotViewModel, AppointmentsViewModel>(
-          create: (_) => AppointmentsViewModel(null),
-          update: (_, slotViewModel, previousAppointmentsViewModel) =>
-              previousAppointmentsViewModel ??
-              AppointmentsViewModel(slotViewModel),
-        ),
-        ChangeNotifierProvider(create: (_) => DoctorsViewModel()),
+        //ChangeNotifierProxyProvider<SlotViewModel, AppointmentsViewModel>(
+        //  create: (_) => AppointmentsViewModel(null),
+        //  update: (_, slotViewModel, previousAppointmentsViewModel) =>
+        //previousAppointmentsViewModel ??
+        //  AppointmentsViewModel(slotViewModel),
+        //),
+        ChangeNotifierProvider(
+            create: (_) => DoctorViewModel()..fetchDoctors()),
         ChangeNotifierProvider(create: (_) => RegisterViewModel()),
         ChangeNotifierProvider(create: (_) => LoginViewModel()),
         ChangeNotifierProvider(create: (_) => AuthViewModel()),
         ChangeNotifierProvider(create: (_) => UserViewModel()),
+        ChangeNotifierProvider(create: (_) => AppointmentsViewModel()),
       ],
       child: const MyApp(),
     ),
@@ -68,6 +70,7 @@ class MyApp extends StatelessWidget {
         '/home': (context) => BottomNavigation(initialPageIndex: 0),
         '/profile': (context) => ProfilePage(),
         '/dashboard': (context) => DashboardPage(),
+        //'/doctorlist': (context) => DoctorListScreen(),
         //'/test-page': (context) => TestFirestorePage()
       },
     );

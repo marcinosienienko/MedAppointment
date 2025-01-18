@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:medical_app/data/viewmodels/appointments_viewmodel.dart';
 import 'package:medical_app/data/models/appointment_model.dart';
 import 'package:medical_app/data/viewmodels/slot_viewmodel.dart';
+import 'package:medical_app/data/viewmodels/user_viewmodel.dart';
 
 class AppointmentsPage extends StatefulWidget {
   @override
@@ -10,15 +11,6 @@ class AppointmentsPage extends StatefulWidget {
 }
 
 class _AppointmentsPageState extends State<AppointmentsPage> {
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<AppointmentsViewModel>(context, listen: false)
-          .loadAppointmentsFromPreferences();
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     final appointmentsViewModel = Provider.of<AppointmentsViewModel>(context);
@@ -51,15 +43,15 @@ class _AppointmentsPageState extends State<AppointmentsPage> {
       margin: EdgeInsets.symmetric(vertical: 8.0),
       child: ListTile(
         title: Text(
-          appointment.doctorName,
+          appointment.doctorId ?? 'Brak nazwy lekarza',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Specjalizacja: ${appointment.specialization}'),
+            Text('Specjalizacja: ${appointment.doctorId}'),
             Text(
-              'Termin: ${appointment.dateTime.toLocal()}',
+              'Termin: ${appointment.date}',
               style: TextStyle(color: Colors.grey),
             ),
           ],
@@ -67,7 +59,8 @@ class _AppointmentsPageState extends State<AppointmentsPage> {
         trailing: IconButton(
           icon: Icon(Icons.cancel, color: Colors.red),
           onPressed: () {
-            _showCancelDialog(context, appointment.id, appointment.doctorId);
+            _showCancelDialog(
+                context, appointment.id, appointment.doctorId ?? '');
           },
         ),
       ),
