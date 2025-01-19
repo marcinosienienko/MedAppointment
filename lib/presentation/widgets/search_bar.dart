@@ -5,6 +5,7 @@ class MainSearchBar extends StatelessWidget {
   final String currentText;
   final VoidCallback onClear;
   final ValueChanged<String> onChanged;
+  final bool autofocus; // Dodano parametr autofocus
 
   const MainSearchBar({
     super.key,
@@ -12,12 +13,14 @@ class MainSearchBar extends StatelessWidget {
     required this.currentText,
     required this.onClear,
     required this.onChanged,
+    this.autofocus = false, // Domyślnie autofocus jest wyłączony
   });
 
   @override
   Widget build(BuildContext context) {
     return TextField(
       controller: searchController,
+      autofocus: autofocus, // Ustawienie autofocus
       style: const TextStyle(color: Colors.black),
       decoration: InputDecoration(
         focusedBorder: OutlineInputBorder(
