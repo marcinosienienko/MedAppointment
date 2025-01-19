@@ -14,6 +14,7 @@ class _AppointmentsPageState extends State<AppointmentsPage> {
   @override
   Widget build(BuildContext context) {
     final appointmentsViewModel = Provider.of<AppointmentsViewModel>(context);
+    final slotViewModel = Provider.of<SlotViewModel>(context, listen: false);
 
     return Scaffold(
       appBar: AppBar(
@@ -28,13 +29,14 @@ class _AppointmentsPageState extends State<AppointmentsPage> {
               itemCount: appointmentsViewModel.appointments.length,
               itemBuilder: (context, index) {
                 final appointment = appointmentsViewModel.appointments[index];
-                return AppointmentCard(appointment, context);
+                return AppointmentCard(appointment, context, slotViewModel);
               },
             ),
     );
   }
 
-  Widget AppointmentCard(Appointment appointment, BuildContext context) {
+  Widget AppointmentCard(Appointment appointment, BuildContext context,
+      SlotViewModel slotViewModel) {
     return Card(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12.0),
@@ -59,8 +61,12 @@ class _AppointmentsPageState extends State<AppointmentsPage> {
         trailing: IconButton(
           icon: Icon(Icons.cancel, color: Colors.red),
           onPressed: () {
-            _cancelAppointment(context, appointment.id,
-                appointment.doctorId ?? '', appointment.slotId ?? '');
+            _cancelAppointment(
+                context,
+                appointment.id,
+                appointment.doctorId ?? '',
+                appointment.slotId ?? '',
+                slotViewModel);
           },
         ),
       ),
@@ -68,7 +74,7 @@ class _AppointmentsPageState extends State<AppointmentsPage> {
   }
 
   void _cancelAppointment(BuildContext context, String appointmentId,
-      String doctorId, String slotId) {
+      String doctorId, String slotId, SlotViewModel slotViewModel) {
     final appointmentsViewModel =
         Provider.of<AppointmentsViewModel>(context, listen: false);
 
@@ -88,7 +94,11 @@ class _AppointmentsPageState extends State<AppointmentsPage> {
             onPressed: () async {
               Navigator.of(context).pop();
               await appointmentsViewModel.cancelAppointment(
-                  appointmentId, doctorId, slotId);
+                appointmentId,
+                doctorId,
+                slotId,
+                slotViewModel,
+              );
             },
             child: const Text('Tak'),
           ),

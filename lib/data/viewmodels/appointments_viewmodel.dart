@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/appointment_model.dart';
 import '../services/firestore_service.dart';
+import '../viewmodels/slot_viewmodel.dart';
 
 class AppointmentsViewModel extends ChangeNotifier {
   final FirestoreService _firestoreService = FirestoreService();
@@ -19,14 +20,20 @@ class AppointmentsViewModel extends ChangeNotifier {
     }
   }
 
-  Future<void> cancelAppointment(
-      String appointmentId, String doctorId, String slotId) async {
+  Future<void> cancelAppointment(String appointmentId, String doctorId,
+      String slotId, SlotViewModel slotViewModel) async {
     try {
       await _firestoreService.cancelAppointment(
           appointmentId, doctorId, slotId);
+
+      // Usuń wizytę z listy lokalnej
       _appointments
           .removeWhere((appointment) => appointment.id == appointmentId);
-      notifyListeners();
+
+      // Przywróć dostępność slotu i odśwież widok
+      await slotViewModel.restoreSlotAvailability(slotId, doctorId);
+
+      notifyListeners(); // Powiadomienie widoku o zmianach
     } catch (e) {
       print('Błąd podczas anulowania wizyty: $e');
     }

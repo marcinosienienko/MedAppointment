@@ -78,7 +78,8 @@ class _CalendarPageState extends State<CalendarPage> {
               duration: const Duration(milliseconds: 300),
               child: slotViewModel.slots.isNotEmpty
                   ? GridView.builder(
-                      key: ValueKey(slotViewModel.slots),
+                      key: ValueKey(
+                          slotViewModel.selectedDay), // Unikalny klucz dla dnia
                       padding: const EdgeInsets.all(16.0),
                       gridDelegate:
                           const SliverGridDelegateWithFixedCrossAxisCount(
