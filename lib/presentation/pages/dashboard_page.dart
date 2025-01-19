@@ -15,35 +15,199 @@ class DashboardPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Dashboard'),
       ),
-      body: Column(
-        children: [
-          // Pasek wyszukiwania
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: MainSearchBar(
-              searchController: doctorViewModel.searchController,
-              currentText: doctorViewModel.searchController.text,
-              onClear: () {
-                doctorViewModel.clearSearch(); // Czyszczenie wyników
-              },
-              onChanged: (query) {
-                doctorViewModel.searchDoctors(query); // Filtrowanie wyników
-              },
+      body: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
+        child: Column(
+          children: [
+            // Pasek wyszukiwania
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: MainSearchBar(
+                searchController: doctorViewModel.searchController,
+                currentText: doctorViewModel.searchController.text,
+                onClear: () {
+                  doctorViewModel.clearSearch();
+                },
+                onChanged: (query) {
+                  doctorViewModel.searchDoctors(query);
+                },
+                autofocus: false,
+              ),
             ),
-          ),
-          // Wyniki wyszukiwania - renderowane tylko, gdy użytkownik wpisuje tekst
-          if (doctorViewModel.searchController.text.isNotEmpty)
-            Expanded(
-              child: Padding(
+
+            // Wyniki wyszukiwania - renderowane tylko, gdy wpisano tekst
+            if (doctorViewModel.searchController.text.isNotEmpty)
+              Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
                 child: SearchResults(
                   doctors: doctorViewModel.filteredDoctors,
                 ),
+              )
+            else
+              Column(
+                children: [
+                  // Baner informacyjny
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Card(
+                      color: Colors.blue[300],
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12.0),
+                      ),
+                      elevation: 2,
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: const [
+                            Text(
+                              '#odwoluje #nieBlokuje',
+                              style: TextStyle(
+                                fontSize: 16.0,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                            SizedBox(height: 8.0),
+                            Text(
+                              'Czy wiesz, że w 2023 roku nie odwołano aż 1.3 miliona wizyt u lekarzy? To generuje kolejki i utrudnia dostęp do specjalistów. Jeśli nie możesz stawić się na wizytę, odwołaj ją lub przełóż.',
+                              style: TextStyle(
+                                  fontSize: 14.0, color: Colors.white),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  // Karty na ekranie głównym
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16.0, vertical: 16.0),
+                    child: Column(
+                      children: [
+                        _buildDashboardCard(
+                          title: 'Nadchodzące wizyty',
+                          subtitle: 'Sprawdź i zarządzaj swoimi wizytami.',
+                          icon: Icons.calendar_today,
+                          color: Colors.blue,
+                          onTap: () {
+                            print('Otwórz Nadchodzące wizyty');
+                          },
+                        ),
+                        const SizedBox(height: 16.0),
+                        _buildDashboardCard(
+                          title: 'Uzupełnij swój profil',
+                          subtitle: 'Dodaj brakujące informacje o sobie.',
+                          icon: Icons.person,
+                          color: Colors.green,
+                          onTap: () {
+                            print('Otwórz Uzupełnij swój profil');
+                          },
+                        ),
+                        const SizedBox(height: 16.0),
+                        _buildDashboardCard(
+                          title: 'Zamów receptę',
+                          subtitle: 'Zamów szybko potrzebne leki.',
+                          icon: Icons.medication,
+                          color: Colors.orange,
+                          onTap: () {
+                            print('Otwórz Zamów receptę');
+                          },
+                        ),
+                        const SizedBox(height: 16.0),
+                        _buildDashboardCard(
+                          title: 'Pierwsza pomoc',
+                          subtitle: 'Dowiedz się, jak udzielić pomocy.',
+                          icon: Icons.health_and_safety,
+                          color: Colors.red,
+                          onTap: () {
+                            print('Otwórz Pierwsza pomoc');
+                          },
+                        ),
+                        const SizedBox(height: 16.0),
+                        _buildDashboardCard(
+                          title: 'Zrealizuj receptę',
+                          subtitle: 'Sprawdź dostępne apteki.',
+                          icon: Icons.local_pharmacy,
+                          color: Colors.purple,
+                          onTap: () {
+                            print('Otwórz Zrealizuj receptę');
+                          },
+                        ),
+                        const SizedBox(height: 16.0),
+                        _buildDashboardCard(
+                          title: 'Dodaj dokumenty',
+                          subtitle: 'Prześlij swoje dokumenty medyczne.',
+                          icon: Icons.upload_file,
+                          color: Colors.teal,
+                          onTap: () {
+                            print('Otwórz Dodaj dokumenty');
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-            )
-          else
-            const SizedBox.shrink(), // Ukryj, gdy nie wpisano tekstu
-        ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDashboardCard({
+    required String title,
+    required String subtitle,
+    required IconData icon,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return Card(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12.0),
+      ),
+      elevation: 4,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12.0),
+        onTap: onTap,
+        splashColor: color.withOpacity(0.3),
+        highlightColor: color.withOpacity(0.1),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Row(
+            children: [
+              CircleAvatar(
+                backgroundColor: color.withOpacity(0.2),
+                radius: 28,
+                child: Icon(icon, size: 28, color: color),
+              ),
+              const SizedBox(width: 16.0),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        fontSize: 16.0,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4.0),
+                    Text(
+                      subtitle,
+                      style: const TextStyle(
+                        fontSize: 14.0,
+                        color: Colors.black54,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
