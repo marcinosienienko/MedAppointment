@@ -14,6 +14,8 @@ class AppointmentCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     DateTime? appointmentDate;
+
+    // Parsowanie daty wizyty
     if (appointment.date != null) {
       try {
         appointmentDate = DateTime.parse(appointment.date!);
@@ -31,7 +33,7 @@ class AppointmentCard extends StatelessWidget {
       child: ListTile(
         leading: CircleAvatar(
           radius: 24,
-          backgroundImage: const AssetImage('assets/images/default_avatar.png'),
+
           backgroundColor: Colors.blueAccent, // Domyślne tło avatara
         ),
         title: Text(
@@ -49,7 +51,7 @@ class AppointmentCard extends StatelessWidget {
             ),
             const SizedBox(height: 4),
             Text(
-              'Termin: ${appointmentDate != null ? appointmentDate.toLocal() : 'Brak terminu'}',
+              'Termin: ${appointmentDate != null ? _formatDateTime(appointmentDate) : 'Brak terminu'}',
               style: const TextStyle(color: Colors.grey),
             ),
           ],
@@ -60,5 +62,11 @@ class AppointmentCard extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  // Formatowanie daty i godziny w czytelny sposób
+  String _formatDateTime(DateTime dateTime) {
+    return '${dateTime.day.toString().padLeft(2, '0')}-${dateTime.month.toString().padLeft(2, '0')}-${dateTime.year} '
+        '${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
   }
 }
