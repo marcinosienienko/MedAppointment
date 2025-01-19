@@ -127,6 +127,16 @@ class SlotViewModel extends ChangeNotifier {
           .doc(slotId)
           .update({'status': 'available'});
       print('Dostępność slotu przywrócona.');
+
+      // Lokalna aktualizacja stanu slotów
+      _allSlots = _allSlots.map((slot) {
+        if (slot.id == slotId) {
+          return slot.copyWith(status: 'available');
+        }
+        return slot;
+      }).toList();
+
+      _filterSlotsBySelectedDay();
       notifyListeners();
     } catch (e) {
       print('Błąd podczas przywracania dostępności slotu: $e');
