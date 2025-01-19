@@ -152,6 +152,8 @@ class _CalendarPageState extends State<CalendarPage> {
               text: 'Zarezerwuj wizytę',
               onPressed: () async {
                 final selectedSlot = slotViewModel.selectedSlot;
+                final currentDoctor = slotViewModel.currentDoctor;
+
                 if (selectedSlot == null) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text('Wybierz slot przed rezerwacją.')),
@@ -159,25 +161,61 @@ class _CalendarPageState extends State<CalendarPage> {
                   return;
                 }
 
-                final success = await slotViewModel.reserveSlot(
-                  selectedSlot.id,
-                  widget.doctorId,
-                  userId,
+                if (currentDoctor == null) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Ładowanie danych lekarza...')),
+                  );
+                  return;
+                }
+
+                // Wyświetl AlertDialog z potwierdzeniem
+                final confirm = await showDialog<bool>(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: Text('Potwierdź rezerwację'),
+                      content: Text(
+                        'Czy na pewno chcesz zarezerwować wizytę u dr ${currentDoctor.name} '
+                        '(${currentDoctor.specialization?.name ?? 'Brak specjalizacji'}) '
+                        'na dzień ${selectedSlot.date} o godzinie ${selectedSlot.startTime}?',
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.of(context).pop(false);
+                          },
+                          child: Text('Anuluj'),
+                        ),
+                        ElevatedButton(
+                          onPressed: () {
+                            Navigator.of(context).pop(true);
+                          },
+                          child: Text('Potwierdź'),
+                        ),
+                      ],
+                    );
+                  },
                 );
 
-                if (success) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Wizyta zarezerwowana!')),
+                if (confirm == true) {
+                  final success = await slotViewModel.reserveSlot(
+                    selectedSlot.id,
+                    widget.doctorId,
+                    userId,
                   );
 
-                  // Opcjonalne odświeżenie ekranu z wizytami
-                  Provider.of<AppointmentsViewModel>(context, listen: false)
-                      .fetchAppointments(userId);
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                        content: Text('Nie udało się zarezerwować wizyty.')),
-                  );
+                  if (success) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Wizyta zarezerwowana!')),
+                    );
+                    Provider.of<AppointmentsViewModel>(context, listen: false)
+                        .fetchAppointments(userId);
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                          content: Text('Nie udało się zarezerwować wizyty.')),
+                    );
+                  }
                 }
               },
             ),

@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import '../models/slot_model.dart';
+import '../models/doctor.dart';
+import '../models/specialization.dart';
 
 class SlotViewModel extends ChangeNotifier {
   List<Slot> _allSlots = [];
@@ -8,13 +10,15 @@ class SlotViewModel extends ChangeNotifier {
   DateTime _selectedDay = DateTime.now();
   DateTime _focusedDay = DateTime.now();
   Slot? _selectedSlot;
+  Doctor? _currentDoctor;
+
+  final FirebaseFirestore _db = FirebaseFirestore.instance;
 
   List<Slot> get slots => _filteredSlots;
   DateTime get selectedDay => _selectedDay;
   DateTime get focusedDay => _focusedDay;
   Slot? get selectedSlot => _selectedSlot;
-
-  final FirebaseFirestore _db = FirebaseFirestore.instance;
+  Doctor? get currentDoctor => _currentDoctor;
 
   void setSlots(List<Slot> slots) {
     _allSlots = slots;
@@ -60,7 +64,7 @@ class SlotViewModel extends ChangeNotifier {
         'doctorId': doctorId,
         'userId': userId,
         'slotId': slotId,
-        'dateTime': DateTime.now().toIso8601String(), // Przykładowa data
+        'dateTime': DateTime.now().toIso8601String(),
         'status': 'booked',
       };
 
@@ -70,7 +74,7 @@ class SlotViewModel extends ChangeNotifier {
       // Lokalna aktualizacja slotów
       _allSlots = _allSlots.map((slot) {
         if (slot.id == slotId) {
-          return slot.copyWith(status: 'available');
+          return slot.copyWith(status: 'booked');
         }
         return slot;
       }).toList();
@@ -87,11 +91,51 @@ class SlotViewModel extends ChangeNotifier {
 
   Future<void> setCurrentDoctorId(String doctorId) async {
     try {
+      _currentDoctor = await fetchDoctorById(doctorId);
       final slots = await fetchSlotsByDoctorId(doctorId);
       setSlots(slots);
+
+      // Debugowanie
+      print('Lekarz: ${_currentDoctor?.name}');
+      print(
+          'Specjalizacja: ${_currentDoctor?.specialization?.name ?? "Brak specjalizacji"}');
+
+      notifyListeners();
     } catch (e) {
-      print('Błąd podczas pobierania slotów: $e');
+      print('Błąd podczas pobierania danych lekarza lub slotów: $e');
     }
+  }
+
+  Future<Doctor?> fetchDoctorById(String doctorId) async {
+    try {
+      final doctorDoc = await _db.collection('doctors').doc(doctorId).get();
+      if (doctorDoc.exists) {
+        final doctorData = doctorDoc.data()!;
+        final specializationId = doctorData['specializationId'];
+
+        Specialization? specialization;
+        if (specializationId != null && specializationId.isNotEmpty) {
+          final specializationDoc = await _db
+              .collection('specializations')
+              .doc(specializationId)
+              .get();
+
+          if (specializationDoc.exists) {
+            specialization = Specialization.fromMap(
+              specializationDoc.data()!,
+              specializationDoc.id,
+            );
+          }
+        }
+
+        return Doctor.fromMap(doctorData, doctorDoc.id).copyWith(
+          specialization: specialization,
+        );
+      }
+    } catch (e) {
+      print('Błąd podczas pobierania danych lekarza: $e');
+    }
+    return null;
   }
 
   Future<List<Slot>> fetchSlotsByDoctorId(String doctorId) async {
