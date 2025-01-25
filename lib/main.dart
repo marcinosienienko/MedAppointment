@@ -16,6 +16,8 @@ import 'package:medical_app/data/viewmodels/auth_view_model.dart';
 import 'package:medical_app/presentation/pages/dashboard_page.dart';
 import 'package:medical_app/data/viewmodels/user_viewmodel.dart';
 import 'package:medical_app/data/viewmodels/appointments_viewmodel.dart';
+import 'package:medical_app/presentation/pages/prescriptions_page.dart';
+import 'package:medical_app/presentation/pages/referrals_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -34,6 +36,7 @@ void main() async {
         //previousAppointmentsViewModel ??
         //  AppointmentsViewModel(slotViewModel),
         //),
+
         ChangeNotifierProvider(
             create: (_) => DoctorViewModel()..fetchDoctors()),
         ChangeNotifierProvider(create: (_) => RegisterViewModel()),
@@ -70,6 +73,8 @@ class MyApp extends StatelessWidget {
         '/home': (context) => BottomNavigation(initialPageIndex: 0),
         '/profile': (context) => ProfilePage(),
         '/dashboard': (context) => DashboardPage(),
+        '/prescriptions': (context) => PrescriptionsPage(),
+        '/referrals': (context) => ReferralsPage(),
         //'/doctorlist': (context) => DoctorListScreen(),
         //'/test-page': (context) => TestFirestorePage()
       },

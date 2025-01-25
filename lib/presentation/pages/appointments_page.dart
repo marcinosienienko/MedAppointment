@@ -39,7 +39,6 @@ class _AppointmentsPageState extends State<AppointmentsPage>
           indicatorColor: Colors.green,
           indicatorSize: TabBarIndicatorSize.tab,
           indicatorWeight: 6,
-          indicatorPadding: EdgeInsets.all(10),
           labelColor: Colors.white, // Kolor tekstu dla aktywnej zakładki
           unselectedLabelColor:
               Colors.white70, // Kolor tekstu dla nieaktywnych zakładek
