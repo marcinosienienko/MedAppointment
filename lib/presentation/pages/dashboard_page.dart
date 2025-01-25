@@ -189,7 +189,8 @@ class _DashboardPageState extends State<DashboardPage> {
                                 icon: Icons.local_pharmacy,
                                 color: Colors.red,
                                 onTap: () {
-                                  print('Otwórz Zrealizuj receptę');
+                                  Navigator.pushNamed(
+                                      context, '/prescriptions');
                                 },
                               ),
                               const SizedBox(height: 8.0),
@@ -199,7 +200,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                 icon: Icons.upload_file,
                                 color: Colors.teal,
                                 onTap: () {
-                                  print('Otwórz Dodaj dokumenty');
+                                  Navigator.pushNamed(context, '/referrals');
                                 },
                               ),
                               const SizedBox(height: 16.0),
@@ -209,7 +210,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                 icon: Icons.person,
                                 color: Colors.lightBlue,
                                 onTap: () {
-                                  print('Otwórz Uzupełnij swój profil');
+                                  Navigator.pushNamed(context, '/profile');
                                 },
                               ),
                             ],
@@ -278,8 +279,8 @@ class _DashboardPageState extends State<DashboardPage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Potwierdź anulowanie'),
-        content: const Text('Czy na pewno chcesz anulować tę wizytę?'),
+        title: const Text('Potwierdź odwołanie'),
+        content: Text('Po potwierdzeniu twoja wizyta zostanie odwołana.'),
         actions: [
           ElevatedButton(
             onPressed: () => Navigator.of(context).pop(),
