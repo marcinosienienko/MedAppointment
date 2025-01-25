@@ -8,46 +8,31 @@ class AppointmentsViewModel extends ChangeNotifier {
   List<Appointment> _appointments = [];
 
   List<Appointment> get appointments => _appointments;
-  Future<Appointment?> fetchNextAppointment(String userId) async {
-    try {
-      final snapshot =
-          await _firestoreService.fetchAppointmentsByUserId(userId);
+  Appointment? getNextUpcomingAppointment() {
+    final now = DateTime.now();
 
-      if (snapshot.isNotEmpty) {
-        // Filtruj tylko przyszłe wizyty
-        final now = DateTime.now();
-        final upcomingAppointments = snapshot
-            .where((appointment) =>
-                appointment.date != null &&
-                DateTime.parse(appointment.date!).isAfter(now))
-            .toList();
-
-        // Posortuj wizyty rosnąco według daty
-        upcomingAppointments.sort((a, b) =>
-            DateTime.parse(a.date!).compareTo(DateTime.parse(b.date!)));
-
-        // Zwróć najbliższą wizytę
-        return upcomingAppointments.isNotEmpty
-            ? upcomingAppointments.first
-            : null;
+    final upcomingAppointments = _appointments.where((appointment) {
+      if (appointment.date != null) {
+        final appointmentDate = DateTime.parse(appointment.date!);
+        return appointmentDate.isAfter(now);
       }
-      return null;
-    } catch (e) {
-      print('Błąd podczas pobierania najbliższej wizyty: $e');
-      return null;
+      return false;
+    }).toList();
+
+    if (upcomingAppointments.isNotEmpty) {
+      upcomingAppointments.sort(
+          (a, b) => DateTime.parse(a.date!).compareTo(DateTime.parse(b.date!)));
+      return upcomingAppointments.first;
     }
+
+    return null;
   }
 
   Future<void> fetchAppointments(String userId) async {
     try {
       print('Ładowanie wizyt dla użytkownika: $userId');
       _appointments = await _firestoreService.fetchAppointmentsByUserId(userId);
-
-      // Dodaj debug print aby sprawdzić format daty
-      for (var appointment in _appointments) {
-        print('Appointment date: ${appointment.date}');
-      }
-
+      print('Załadowano ${_appointments.length} wizyt.');
       notifyListeners();
     } catch (e) {
       print('Błąd podczas pobierania wizyt: $e');
