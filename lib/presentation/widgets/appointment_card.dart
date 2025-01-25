@@ -28,8 +28,9 @@ class AppointmentCard extends StatelessWidget {
     return Card(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12.0),
+        side: BorderSide(color: Colors.lightBlue),
       ),
-      elevation: 3,
+      elevation: 1,
       margin: const EdgeInsets.symmetric(vertical: 8.0),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -79,7 +80,7 @@ class AppointmentCard extends StatelessWidget {
                     const Text(
                       'Termin wizyty:',
                       style: TextStyle(
-                        color: Colors.grey,
+                        color: Colors.black,
                         fontSize: 12,
                       ),
                     ),
@@ -97,19 +98,26 @@ class AppointmentCard extends StatelessWidget {
                   children: [
                     TextButton(
                       onPressed: () {
-                        // TODO: Implementacja funkcji przekładania wizyty
                         print('Przełóż wizytę');
                       },
                       child: const Text('Przełóż'),
+                      style: TextButton.styleFrom(
+                        backgroundColor: Colors.lightBlue,
+                        foregroundColor: Colors.white,
+                      ),
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: 20),
                     ElevatedButton(
                       onPressed: onCancel,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.red,
                         foregroundColor: Colors.white,
                       ),
-                      child: const Text('Odwołaj'),
+                      child: const Text(
+                        'Odwołaj',
+                        style: TextStyle(
+                            fontSize: 14, fontWeight: FontWeight.bold),
+                      ),
                     ),
                   ],
                 ),
