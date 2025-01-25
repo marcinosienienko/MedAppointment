@@ -28,6 +28,18 @@ class AppointmentsViewModel extends ChangeNotifier {
     return null;
   }
 
+  List<Appointment> get upcomingAppointments => _appointments
+      .where((appointment) => appointment.status == 'booked')
+      .toList();
+
+  List<Appointment> get cancelledAppointments => _appointments
+      .where((appointment) => appointment.status == 'cancelled')
+      .toList();
+
+  List<Appointment> get completedAppointments => _appointments
+      .where((appointment) => appointment.status == 'completed')
+      .toList();
+
   Future<void> fetchAppointments(String userId) async {
     try {
       print('Ładowanie wizyt dla użytkownika: $userId');

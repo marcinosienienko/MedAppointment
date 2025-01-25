@@ -11,20 +11,138 @@ class AppointmentsPage extends StatefulWidget {
   _AppointmentsPageState createState() => _AppointmentsPageState();
 }
 
-class _AppointmentsPageState extends State<AppointmentsPage> {
-  final FirebaseFirestore _db = FirebaseFirestore.instance;
+class _AppointmentsPageState extends State<AppointmentsPage>
+    with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 3, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final appointmentsViewModel = Provider.of<AppointmentsViewModel>(context);
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Twoje wizyty'),
+        bottom: TabBar(
+          controller: _tabController,
+          indicatorColor: Colors.green,
+          indicatorSize: TabBarIndicatorSize.tab,
+          indicatorWeight: 6,
+          indicatorPadding: EdgeInsets.all(10),
+          labelColor: Colors.white, // Kolor tekstu dla aktywnej zakładki
+          unselectedLabelColor:
+              Colors.white70, // Kolor tekstu dla nieaktywnych zakładek
+          labelStyle: const TextStyle(
+            fontSize: 16.0,
+            fontWeight:
+                FontWeight.bold, // Wyróżniona czcionka dla aktywnej zakładki
+          ),
+          unselectedLabelStyle: const TextStyle(
+            fontSize: 14.0,
+          ),
+          tabs: const [
+            Tab(
+              icon: Icon(Icons.check_circle_outline), // Ikona dla aktualnych
+              text: 'Aktualne',
+            ),
+            Tab(
+              icon: Icon(Icons.cancel_outlined), // Ikona dla anulowanych
+              text: 'Anulowane',
+            ),
+            Tab(
+              icon: Icon(Icons.done_all), // Ikona dla zrealizowanych
+              text: 'Zrealizowane',
+            ),
+          ],
+        ),
+      ),
+      body: TabBarView(
+        controller: _tabController,
+        children: [
+          _buildAppointmentsList(appointmentsViewModel.upcomingAppointments),
+          _buildAppointmentsList(appointmentsViewModel.cancelledAppointments),
+          _buildAppointmentsList(appointmentsViewModel.completedAppointments),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAppointmentsList(List<Appointment> appointments) {
+    if (appointments.isEmpty) {
+      return const Center(
+        child: Text('Brak wizyt w tej kategorii.'),
+      );
+    }
+
+    return ListView.builder(
+      padding: const EdgeInsets.all(16.0),
+      itemCount: appointments.length,
+      itemBuilder: (context, index) {
+        final appointment = appointments[index];
+        return FutureBuilder<List<dynamic>>(
+          future: Future.wait([
+            _fetchDoctorAndSpecialization(appointment.doctorId!),
+            _fetchSlotDetails(appointment.doctorId!, appointment.slotId!),
+          ]),
+          builder: (context, snapshot) {
+            if (!snapshot.hasData) {
+              return const Center(child: CircularProgressIndicator());
+            }
+
+            final doctorData = snapshot.data![0] as Map<String, dynamic>;
+            final slotDetails = snapshot.data![1] as Map<String, dynamic>?;
+
+            final slotDate = slotDetails?['date'] ?? 'Brak daty';
+            final slotTime = slotDetails?['startTime'] ?? '00:00';
+
+            return AppointmentCard(
+              appointment: Appointment(
+                id: appointment.id,
+                doctorName: doctorData['doctorName'],
+                specialization: doctorData['specializationName'],
+                date: '$slotDate $slotTime',
+                status: appointment.status,
+              ),
+              onCancel: () {
+                _cancelAppointment(
+                  context,
+                  appointment.id!,
+                  appointment.doctorId!,
+                  appointment.slotId!,
+                );
+              },
+            );
+          },
+        );
+      },
+    );
+  }
 
   Future<Map<String, dynamic>> _fetchDoctorAndSpecialization(
       String doctorId) async {
     try {
-      final doctorDoc = await _db.collection('doctors').doc(doctorId).get();
+      final doctorDoc = await FirebaseFirestore.instance
+          .collection('doctors')
+          .doc(doctorId)
+          .get();
       if (doctorDoc.exists) {
         final doctorData = doctorDoc.data()!;
         final specializationId = doctorData['specializationId'];
 
         String? specializationName;
         if (specializationId != null) {
-          final specializationDoc = await _db
+          final specializationDoc = await FirebaseFirestore.instance
               .collection('specializations')
               .doc(specializationId)
               .get();
@@ -52,7 +170,7 @@ class _AppointmentsPageState extends State<AppointmentsPage> {
   Future<Map<String, dynamic>?> _fetchSlotDetails(
       String doctorId, String slotId) async {
     try {
-      final slotDoc = await _db
+      final slotDoc = await FirebaseFirestore.instance
           .collection('doctors')
           .doc(doctorId)
           .collection('slots')
@@ -67,66 +185,6 @@ class _AppointmentsPageState extends State<AppointmentsPage> {
     }
 
     return null;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final appointmentsViewModel = Provider.of<AppointmentsViewModel>(context);
-
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Twoje wizyty'),
-      ),
-      body: appointmentsViewModel.appointments.isEmpty
-          ? const Center(
-              child: Text('Brak zarezerwowanych wizyt.'),
-            )
-          : ListView.builder(
-              padding: const EdgeInsets.all(16.0),
-              itemCount: appointmentsViewModel.appointments.length,
-              itemBuilder: (context, index) {
-                final appointment = appointmentsViewModel.appointments[index];
-                return FutureBuilder<List<dynamic>>(
-                  future: Future.wait([
-                    _fetchDoctorAndSpecialization(appointment.doctorId!),
-                    _fetchSlotDetails(appointment.doctorId!,
-                        appointment.slotId!), // Zmienione na _fetchSlotDetails
-                  ]),
-                  builder: (context, snapshot) {
-                    if (!snapshot.hasData) {
-                      return const Center(child: CircularProgressIndicator());
-                    }
-
-                    final doctorData =
-                        snapshot.data![0] as Map<String, dynamic>;
-                    final slotDetails =
-                        snapshot.data![1] as Map<String, dynamic>?;
-
-                    final slotDate = slotDetails?['date'] ?? 'Brak daty';
-                    final slotTime = slotDetails?['startTime'] ?? '00:00';
-
-                    return AppointmentCard(
-                      appointment: Appointment(
-                        id: appointment.id,
-                        doctorName: doctorData['doctorName'],
-                        specialization: doctorData['specializationName'],
-                        date: '$slotDate $slotTime', // Połącz datę i godzinę
-                        status: appointment.status,
-                      ),
-                      onCancel: () {
-                        _cancelAppointment(
-                          context,
-                          appointment.id!,
-                          appointment.doctorId!,
-                          appointment.slotId!,
-                        );
-                      },
-                    );
-                  },
-                );
-              },
-            ),
-    );
   }
 
   void _cancelAppointment(BuildContext context, String appointmentId,
