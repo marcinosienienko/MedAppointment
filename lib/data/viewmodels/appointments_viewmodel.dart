@@ -42,7 +42,12 @@ class AppointmentsViewModel extends ChangeNotifier {
     try {
       print('Ładowanie wizyt dla użytkownika: $userId');
       _appointments = await _firestoreService.fetchAppointmentsByUserId(userId);
-      print('Załadowano ${_appointments.length} wizyt.');
+
+      // Dodaj debug print aby sprawdzić format daty
+      for (var appointment in _appointments) {
+        print('Appointment date: ${appointment.date}');
+      }
+
       notifyListeners();
     } catch (e) {
       print('Błąd podczas pobierania wizyt: $e');

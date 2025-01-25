@@ -49,7 +49,8 @@ class _AppointmentsPageState extends State<AppointmentsPage> {
     };
   }
 
-  Future<String?> _fetchSlotDate(String doctorId, String slotId) async {
+  Future<Map<String, dynamic>?> _fetchSlotDetails(
+      String doctorId, String slotId) async {
     try {
       final slotDoc = await _db
           .collection('doctors')
@@ -59,10 +60,10 @@ class _AppointmentsPageState extends State<AppointmentsPage> {
           .get();
 
       if (slotDoc.exists) {
-        return slotDoc.data()?['date'];
+        return slotDoc.data();
       }
     } catch (e) {
-      print('Błąd podczas pobierania daty slotu: $e');
+      print('Błąd podczas pobierania szczegółów slotu: $e');
     }
 
     return null;
@@ -88,7 +89,8 @@ class _AppointmentsPageState extends State<AppointmentsPage> {
                 return FutureBuilder<List<dynamic>>(
                   future: Future.wait([
                     _fetchDoctorAndSpecialization(appointment.doctorId!),
-                    _fetchSlotDate(appointment.doctorId!, appointment.slotId!),
+                    _fetchSlotDetails(appointment.doctorId!,
+                        appointment.slotId!), // Zmienione na _fetchSlotDetails
                   ]),
                   builder: (context, snapshot) {
                     if (!snapshot.hasData) {
@@ -97,14 +99,18 @@ class _AppointmentsPageState extends State<AppointmentsPage> {
 
                     final doctorData =
                         snapshot.data![0] as Map<String, dynamic>;
-                    final slotDate = snapshot.data![1] as String?;
+                    final slotDetails =
+                        snapshot.data![1] as Map<String, dynamic>?;
+
+                    final slotDate = slotDetails?['date'] ?? 'Brak daty';
+                    final slotTime = slotDetails?['startTime'] ?? '00:00';
 
                     return AppointmentCard(
                       appointment: Appointment(
                         id: appointment.id,
                         doctorName: doctorData['doctorName'],
                         specialization: doctorData['specializationName'],
-                        date: slotDate,
+                        date: '$slotDate $slotTime', // Połącz datę i godzinę
                         status: appointment.status,
                       ),
                       onCancel: () {
