@@ -34,7 +34,7 @@ class _CalendarPageState extends State<CalendarPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Kalendarz wizyt'),
+        title: const Text('Kalendarz wizyt'),
       ),
       body: Column(
         children: [
@@ -78,8 +78,7 @@ class _CalendarPageState extends State<CalendarPage> {
               duration: const Duration(milliseconds: 300),
               child: slotViewModel.slots.isNotEmpty
                   ? GridView.builder(
-                      key: ValueKey(
-                          slotViewModel.selectedDay), // Unikalny klucz dla dnia
+                      key: ValueKey(slotViewModel.selectedDay),
                       padding: const EdgeInsets.all(16.0),
                       gridDelegate:
                           const SliverGridDelegateWithFixedCrossAxisCount(
@@ -147,7 +146,7 @@ class _CalendarPageState extends State<CalendarPage> {
           ),
           Padding(
             padding:
-                const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
+                const EdgeInsets.only(bottom: 100, left: 16.0, right: 16.0),
             child: PrimaryButton(
               text: 'Zarezerwuj wizytę',
               onPressed: () async {
@@ -173,24 +172,92 @@ class _CalendarPageState extends State<CalendarPage> {
                   context: context,
                   builder: (BuildContext context) {
                     return AlertDialog(
-                      title: Text('Potwierdź rezerwację'),
-                      content: Text(
-                        'Czy na pewno chcesz zarezerwować wizytę u dr ${currentDoctor.name} '
-                        '(${currentDoctor.specialization?.name ?? 'Brak specjalizacji'}) '
-                        'na dzień ${selectedSlot.date} o godzinie ${selectedSlot.startTime}?',
+                      backgroundColor: Colors.white,
+                      title: Row(
+                        children: [
+                          Icon(Icons.info_outline, color: Colors.blue),
+                          const SizedBox(width: 8),
+                          const Text('Potwierdź rezerwację'),
+                        ],
+                      ),
+                      content: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text.rich(
+                            TextSpan(
+                              children: [
+                                const TextSpan(
+                                  text: 'Lekarz: ',
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                                TextSpan(text: currentDoctor.name),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text.rich(
+                            TextSpan(
+                              children: [
+                                const TextSpan(
+                                  text: 'Specjalizacja: ',
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                                TextSpan(
+                                    text: currentDoctor.specialization?.name ??
+                                        'Brak danych'),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text.rich(
+                            TextSpan(
+                              children: [
+                                const TextSpan(
+                                  text: 'Data: ',
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                                TextSpan(text: selectedSlot.date),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text.rich(
+                            TextSpan(
+                              children: [
+                                const TextSpan(
+                                  text: 'Godzina: ',
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                                TextSpan(text: selectedSlot.startTime),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
                       actions: [
-                        TextButton(
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.lightBlue[50],
+                            foregroundColor: Colors.black,
+                          ),
                           onPressed: () {
                             Navigator.of(context).pop(false);
                           },
-                          child: Text('Anuluj'),
+                          child: const Text('Anuluj'),
                         ),
                         ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.lightBlue,
+                            foregroundColor: Colors.white,
+                            textStyle: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                           onPressed: () {
                             Navigator.of(context).pop(true);
                           },
-                          child: Text('Potwierdź'),
+                          child: const Text('Potwierdź'),
                         ),
                       ],
                     );

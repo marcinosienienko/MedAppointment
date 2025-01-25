@@ -92,10 +92,15 @@ class _DashboardPageState extends State<DashboardPage> {
   Widget build(BuildContext context) {
     final doctorViewModel = Provider.of<DoctorViewModel>(context);
     final appointmentsViewModel = Provider.of<AppointmentsViewModel>(context);
+    final userViewModel =
+        Provider.of<UserViewModel>(context); // Pobierz UserViewModel
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Dashboard'),
+        title: userViewModel.currentUser != null
+            ? Text('Witaj, ${userViewModel.currentUser!.firstName}!')
+            : const Text(
+                'Witaj!'), // Wyświetl imię użytkownika lub domyślne powitanie
       ),
       body: Stack(
         children: [
@@ -276,10 +281,15 @@ class _DashboardPageState extends State<DashboardPage> {
         title: const Text('Potwierdź anulowanie'),
         content: const Text('Czy na pewno chcesz anulować tę wizytę?'),
         actions: [
-          TextButton(
+          ElevatedButton(
             onPressed: () => Navigator.of(context).pop(),
             child: const Text('Nie'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.lightBlue[400],
+              foregroundColor: Colors.white,
+            ),
           ),
+          const SizedBox(width: 32),
           ElevatedButton(
             onPressed: () {
               Navigator.of(context).pop();
@@ -295,10 +305,10 @@ class _DashboardPageState extends State<DashboardPage> {
               );
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
+              backgroundColor: Colors.red[400],
               foregroundColor: Colors.white,
             ),
-            child: const Text('Tak'),
+            child: const Text('Odwołuję'),
           ),
         ],
       ),
