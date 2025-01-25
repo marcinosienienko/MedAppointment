@@ -63,25 +63,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   child: Column(
                     children: [
                       // Avatar użytkownika
-                      Center(
-                        child: CircleAvatar(
-                          radius: 50,
-                          backgroundColor: Colors.blueGrey,
-                          backgroundImage: user.avatarUrl != null
-                              ? NetworkImage(user.avatarUrl!)
-                              : null,
-                          child: user.avatarUrl == null
-                              ? Text(
-                                  '${user.firstName[0]}${user.lastName[0]}',
-                                  style: const TextStyle(
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                  ),
-                                )
-                              : null,
-                        ),
-                      ),
+
                       const SizedBox(height: 16),
                       if (isEditing)
                         _buildEditForm(userViewModel)

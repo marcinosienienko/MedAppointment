@@ -1,14 +1,40 @@
 import 'package:flutter/material.dart';
 import 'package:medical_app/data/models/doctor.dart';
-import 'package:medical_app/presentation/pages/doctor_details_page.dart'; // Import strony szczegółów
+import 'package:medical_app/presentation/pages/doctor_details_page.dart';
 
 class SearchResults extends StatelessWidget {
   final List<Doctor> doctors;
 
-  const SearchResults({
+  SearchResults({
     super.key,
     required this.doctors,
   });
+
+  // Mapa specjalizacji do ikon
+  final Map<String, IconData> specializationIcons = {
+    'Lekarz rodzinny': Icons.home,
+    'Kardiolog': Icons.favorite,
+    'Dermatolog': Icons.healing,
+    'Okulista': Icons.visibility,
+    'Pediatra': Icons.child_care,
+    'Chirurg': Icons.local_hospital,
+    'Onkolog': Icons.science,
+    'Ginekolog': Icons.pregnant_woman,
+    'Urolog': Icons.male,
+  };
+
+  // Mapa specjalizacji do kolorów
+  final Map<String, Color> specializationColors = {
+    'Lekarz rodzinny': Colors.green,
+    'Kardiolog': Colors.red,
+    'Dermatolog': Colors.orange,
+    'Okulista': Colors.blue,
+    'Pediatra': Colors.purple,
+    'Chirurg': Colors.teal,
+    'Onkolog': Colors.pink,
+    'Ginekolog': Colors.amber,
+    'Urolog': Colors.cyan,
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -29,6 +55,11 @@ class SearchResults extends StatelessWidget {
         itemCount: doctors.length,
         itemBuilder: (context, index) {
           final doctor = doctors[index];
+          final icon = specializationIcons[doctor.specialization?.name] ??
+              Icons.person; // Domyślna ikona, jeśli brak specjalizacji
+          final color = specializationColors[doctor.specialization?.name] ??
+              Colors.grey; // Domyślny kolor, jeśli brak specjalizacji
+
           return Padding(
             padding: const EdgeInsets.symmetric(vertical: 1.0, horizontal: 1.0),
             child: Material(
@@ -50,11 +81,11 @@ class SearchResults extends StatelessWidget {
                       const EdgeInsets.all(16.0), // Padding wewnętrzny
                   leading: CircleAvatar(
                     radius: 24,
-                    backgroundImage: doctor.avatarUrl != null
-                        ? NetworkImage(doctor.avatarUrl!)
-                        : const AssetImage('assets/images/default_avatar.png')
-                            as ImageProvider,
-                    backgroundColor: Colors.grey[300],
+                    backgroundColor: color, // Użyj koloru z mapy
+                    child: Icon(
+                      icon,
+                      color: Colors.white, // Kolor ikony
+                    ),
                   ),
                   title: Text(
                     doctor.name,
