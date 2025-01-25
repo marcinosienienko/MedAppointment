@@ -97,12 +97,15 @@ class _DashboardPageState extends State<DashboardPage> {
       appBar: AppBar(
         title: const Text('Dashboard'),
       ),
-      body: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        child: Column(
-          children: [
-            // Pasek wyszukiwania
-            Padding(
+      body: Stack(
+        children: [
+          // Stały pasek wyszukiwania na górze
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: Container(
+              color: Theme.of(context).scaffoldBackgroundColor,
               padding: const EdgeInsets.all(8.0),
               child: MainSearchBar(
                 searchController: doctorViewModel.searchController,
@@ -116,123 +119,104 @@ class _DashboardPageState extends State<DashboardPage> {
                 autofocus: false,
               ),
             ),
-
-            // Wyniki wyszukiwania - renderowane tylko, gdy wpisano tekst
-            if (doctorViewModel.searchController.text.isNotEmpty)
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                child: SearchResults(
-                  doctors: doctorViewModel.filteredDoctors,
-                ),
-              )
-            else
-              Column(
+          ),
+          // Przewijalna zawartość pod paskiem wyszukiwania
+          Padding(
+            padding: const EdgeInsets.only(
+                top: 70), // Przestrzeń na pasek wyszukiwania
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              child: Column(
                 children: [
-                  // Baner informacyjny
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Card(
-                      color: Colors.blue[300],
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12.0),
+                  // Wyniki wyszukiwania - renderowane tylko, gdy wpisano tekst
+                  if (doctorViewModel.searchController.text.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: SearchResults(
+                        doctors: doctorViewModel.filteredDoctors,
                       ),
-                      elevation: 2,
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: const [
-                            Text(
-                              '#odwoluje #nieBlokuje',
-                              style: TextStyle(
-                                fontSize: 16.0,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            ),
-                            SizedBox(height: 8.0),
-                            Text(
-                              'Czy wiesz, że w 2023 roku nie odwołano aż 1.3 miliona wizyt u lekarzy? To generuje kolejki i utrudnia dostęp do specjalistów. Jeśli nie możesz stawić się na wizytę, odwołaj ją lub przełóż.',
-                              style: TextStyle(
-                                  fontSize: 14.0, color: Colors.white),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  // Sekcja nadchodzących wizyt
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    )
+                  else
+                    Column(
                       children: [
-                        const Text(
-                          'Nadchodząca wizyta',
-                          style: TextStyle(
-                            fontSize: 18.0,
-                            fontWeight: FontWeight.bold,
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Baner(),
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 8.0),
+                                child: const Text(
+                                  'Nadchodząca wizyta',
+                                  style: TextStyle(
+                                    fontSize: 18.0,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 4.0),
+                              _buildUpcomingAppointment(appointmentsViewModel),
+                            ],
                           ),
                         ),
-                        const SizedBox(height: 8.0),
-                        _buildUpcomingAppointment(appointmentsViewModel),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 16.0),
-
-                  // Karty na ekranie głównym
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Column(
-                      children: [
-                        _buildDashboardCard(
-                          title: 'Wszystkie wizyty',
-                          subtitle: 'Sprawdź i zarządzaj swoimi wizytami.',
-                          icon: Icons.calendar_today,
-                          color: Colors.blue,
-                          onTap: () {
-                            Navigator.pushNamed(context, '/appointments');
-                          },
-                        ),
-                        const SizedBox(height: 16.0),
-                        _buildDashboardCard(
-                          title: 'Recepty',
-                          subtitle: 'Zobacz swoje recepty',
-                          icon: Icons.local_pharmacy,
-                          color: Colors.red,
-                          onTap: () {
-                            print('Otwórz Zrealizuj receptę');
-                          },
-                        ),
-                        const SizedBox(height: 16.0),
-                        _buildDashboardCard(
-                          title: 'Skierowania',
-                          subtitle: 'Zobacz swoje skierowania',
-                          icon: Icons.upload_file,
-                          color: Colors.teal,
-                          onTap: () {
-                            print('Otwórz Dodaj dokumenty');
-                          },
-                        ),
-                        const SizedBox(height: 16.0),
-                        _buildDashboardCard(
-                          title: 'Uzupełnij swój profil',
-                          subtitle: 'Dodaj brakujące informacje o sobie.',
-                          icon: Icons.person,
-                          color: Colors.lightBlue,
-                          onTap: () {
-                            print('Otwórz Uzupełnij swój profil');
-                          },
+                        const SizedBox(height: 4.0),
+                        // Karty na ekranie głównym
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          child: Column(
+                            children: [
+                              _buildDashboardCard(
+                                title: 'Wszystkie wizyty',
+                                subtitle:
+                                    'Sprawdź i zarządzaj swoimi wizytami.',
+                                icon: Icons.calendar_today,
+                                color: Colors.blue,
+                                onTap: () {
+                                  Navigator.pushNamed(context, '/appointments');
+                                },
+                              ),
+                              const SizedBox(height: 8.0),
+                              _buildDashboardCard(
+                                title: 'Recepty',
+                                subtitle: 'Zobacz swoje recepty',
+                                icon: Icons.local_pharmacy,
+                                color: Colors.red,
+                                onTap: () {
+                                  print('Otwórz Zrealizuj receptę');
+                                },
+                              ),
+                              const SizedBox(height: 8.0),
+                              _buildDashboardCard(
+                                title: 'Skierowania',
+                                subtitle: 'Zobacz swoje skierowania',
+                                icon: Icons.upload_file,
+                                color: Colors.teal,
+                                onTap: () {
+                                  print('Otwórz Dodaj dokumenty');
+                                },
+                              ),
+                              const SizedBox(height: 16.0),
+                              _buildDashboardCard(
+                                title: 'Uzupełnij swój profil',
+                                subtitle: 'Dodaj brakujące informacje o sobie.',
+                                icon: Icons.person,
+                                color: Colors.lightBlue,
+                                onTap: () {
+                                  print('Otwórz Uzupełnij swój profil');
+                                },
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                     ),
-                  ),
                 ],
               ),
-          ],
-        ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -332,46 +316,94 @@ class _DashboardPageState extends State<DashboardPage> {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12.0),
       ),
-      elevation: 4,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(12.0),
-        onTap: onTap,
-        splashColor: color.withOpacity(0.3),
-        highlightColor: color.withOpacity(0.1),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Row(
-            children: [
-              CircleAvatar(
-                backgroundColor: color.withOpacity(0.2),
-                radius: 28,
-                child: Icon(icon, size: 28, color: color),
-              ),
-              const SizedBox(width: 16.0),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: const TextStyle(
-                        fontSize: 16.0,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 4.0),
-                    Text(
-                      subtitle,
-                      style: const TextStyle(
-                        fontSize: 14.0,
-                        color: Colors.black54,
-                      ),
-                    ),
-                  ],
+      elevation: 0,
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12.0),
+          border: Border.all(color: color, width: 1),
+          color: Colors.white,
+        ),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(12.0),
+          onTap: onTap,
+          splashColor: color.withOpacity(0.3),
+          highlightColor: color.withOpacity(0.1),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
+              children: [
+                CircleAvatar(
+                  backgroundColor: color.withOpacity(0.2),
+                  radius: 28,
+                  child: Icon(icon, size: 28, color: color),
                 ),
-              ),
-            ],
+                const SizedBox(width: 16.0),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: const TextStyle(
+                          fontSize: 16.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 4.0),
+                      Text(
+                        subtitle,
+                        style: const TextStyle(
+                          fontSize: 14.0,
+                          color: Colors.black54,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class Baner extends StatelessWidget {
+  const Baner({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      color: Colors.blue[300],
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12.0),
+      ),
+      elevation: 2,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: const [
+            Text(
+              '#ODWOŁUJE #NIEBLOKUJE',
+              style: TextStyle(
+                fontSize: 16.0,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+            SizedBox(height: 8.0),
+            Text(
+              'Nie możesz stawić się na wizytę? Odwołaj ją lub przełóż. Pomóż zmniejszyć kolejki!',
+              style: TextStyle(
+                fontSize: 14.0,
+                color: Colors.white,
+              ),
+            ),
+          ],
         ),
       ),
     );
