@@ -97,52 +97,32 @@ class DashboardPage extends StatelessWidget {
                         ),
                         const SizedBox(height: 16.0),
                         _buildDashboardCard(
-                          title: 'Uzupełnij swój profil',
-                          subtitle: 'Dodaj brakujące informacje o sobie.',
-                          icon: Icons.person,
-                          color: Colors.green,
-                          onTap: () {
-                            print('Otwórz Uzupełnij swój profil');
-                          },
-                        ),
-                        const SizedBox(height: 16.0),
-                        _buildDashboardCard(
-                          title: 'Zamów receptę',
-                          subtitle: 'Zamów szybko potrzebne leki.',
-                          icon: Icons.medication,
-                          color: Colors.orange,
-                          onTap: () {
-                            print('Otwórz Zamów receptę');
-                          },
-                        ),
-                        const SizedBox(height: 16.0),
-                        _buildDashboardCard(
-                          title: 'Pierwsza pomoc',
-                          subtitle: 'Dowiedz się, jak udzielić pomocy.',
-                          icon: Icons.health_and_safety,
-                          color: Colors.red,
-                          onTap: () {
-                            print('Otwórz Pierwsza pomoc');
-                          },
-                        ),
-                        const SizedBox(height: 16.0),
-                        _buildDashboardCard(
-                          title: 'Zrealizuj receptę',
-                          subtitle: 'Sprawdź dostępne apteki.',
+                          title: 'Recepty',
+                          subtitle: 'Zobacz swoje recepty',
                           icon: Icons.local_pharmacy,
-                          color: Colors.purple,
+                          color: Colors.red,
                           onTap: () {
                             print('Otwórz Zrealizuj receptę');
                           },
                         ),
                         const SizedBox(height: 16.0),
                         _buildDashboardCard(
-                          title: 'Dodaj dokumenty',
-                          subtitle: 'Prześlij swoje dokumenty medyczne.',
+                          title: 'Skierowania',
+                          subtitle: 'Zobacz swoje skierowania',
                           icon: Icons.upload_file,
                           color: Colors.teal,
                           onTap: () {
                             print('Otwórz Dodaj dokumenty');
+                          },
+                        ),
+                        const SizedBox(height: 16.0),
+                        _buildDashboardCard(
+                          title: 'Uzupełnij swój profil',
+                          subtitle: 'Dodaj brakujące informacje o sobie.',
+                          icon: Icons.person,
+                          color: Colors.lightBlue,
+                          onTap: () {
+                            print('Otwórz Uzupełnij swój profil');
                           },
                         ),
                       ],
