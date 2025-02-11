@@ -152,6 +152,8 @@ class _CalendarPageState extends State<CalendarPage> {
               onPressed: () async {
                 final selectedSlot = slotViewModel.selectedSlot;
                 final currentDoctor = slotViewModel.currentDoctor;
+                final appointmentsViewModel =
+                    Provider.of<AppointmentsViewModel>(context, listen: false);
 
                 if (selectedSlot == null) {
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -265,10 +267,11 @@ class _CalendarPageState extends State<CalendarPage> {
                 );
 
                 if (confirm == true) {
-                  final success = await slotViewModel.reserveSlot(
-                    selectedSlot.id,
-                    widget.doctorId,
-                    userId,
+                  final success =
+                      await appointmentsViewModel.reserveAppointment(
+                    slotId: selectedSlot.id,
+                    doctorId: currentDoctor.id,
+                    userId: userId,
                   );
 
                   if (success) {

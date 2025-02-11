@@ -21,7 +21,6 @@ class AuthViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Rejestracja użytkownika
   Future<bool> registerUser({
     required String email,
     required String password,
@@ -50,7 +49,6 @@ class AuthViewModel extends ChangeNotifier {
     }
   }
 
-  /// Logowanie użytkownika
   Future<bool> loginUser({
     required String email,
     required String password,
@@ -88,7 +86,6 @@ class AuthViewModel extends ChangeNotifier {
     }
   }
 
-  /// Reset hasła
   Future<void> resetPassword(String email) async {
     try {
       _setLoading(true);

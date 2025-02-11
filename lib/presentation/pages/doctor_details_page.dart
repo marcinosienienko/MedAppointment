@@ -84,7 +84,6 @@ class DoctorDetailsPage extends StatelessWidget {
                     final slotViewModel =
                         Provider.of<SlotViewModel>(context, listen: false);
                     slotViewModel.setCurrentDoctorId(doctor.id);
-
                     Navigator.push(
                       context,
                       MaterialPageRoute(

@@ -3,6 +3,11 @@ import 'package:medical_app/data/models/auth_model.dart';
 
 class RegisterViewModel extends ChangeNotifier {
   final AuthModel _authModel = AuthModel();
+  final String allFieldsRequired = "Wszystkie pola są wymagane.";
+  final String passwordsDoNotMatch = "Hasła nie są zgodne.";
+  final String successMessage = 'Rejestracja zakończona sukcesem!';
+  final String errorRegistration =
+      'Rejestracja nie powiodła się. Spróbuj ponownie.';
 
   String? firstName;
   String? lastName;
@@ -53,26 +58,25 @@ class RegisterViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> registerUser() async {
+  Future<bool> registerUser() async {
     if (firstName == null ||
         lastName == null ||
         email == null ||
         phoneNumber == null ||
         password == null ||
         confirmPassword == null) {
-      errorMessage = "Wszystkie pola są wymagane.";
+      errorMessage = allFieldsRequired;
       notifyListeners();
-      return;
+      return false;
     }
 
     if (password != confirmPassword) {
-      errorMessage = "Hasła nie są zgodne.";
+      errorMessage = passwordsDoNotMatch;
       notifyListeners();
-      return;
+      return false;
     }
 
     isLoading = true;
-    errorMessage = null;
     notifyListeners();
 
     try {
@@ -83,8 +87,12 @@ class RegisterViewModel extends ChangeNotifier {
         lastName: lastName!,
         phoneNumber: phoneNumber!,
       );
+      errorMessage = null;
+      return true;
     } catch (e) {
       errorMessage = e.toString();
+      return false;
+    } finally {
       isLoading = false;
       notifyListeners();
     }

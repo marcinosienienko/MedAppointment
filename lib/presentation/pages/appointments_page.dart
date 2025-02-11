@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:medical_app/data/viewmodels/appointments_viewmodel.dart';
-import 'package:medical_app/data/viewmodels/slot_viewmodel.dart';
 import 'package:medical_app/data/models/appointment_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:medical_app/presentation/widgets/appointment_card.dart';
@@ -69,9 +68,9 @@ class _AppointmentsPageState extends State<AppointmentsPage>
       body: TabBarView(
         controller: _tabController,
         children: [
-          _buildAppointmentsList(appointmentsViewModel.upcomingAppointments),
-          _buildAppointmentsList(appointmentsViewModel.cancelledAppointments),
-          _buildAppointmentsList(appointmentsViewModel.completedAppointments),
+          // _buildAppointmentsList(appointmentsViewModel.appointments),
+          // _buildAppointmentsList(appointmentsViewModel.appointments),
+          // _buildAppointmentsList(appointmentsViewModel.appointments),
         ],
       ),
     );
@@ -207,10 +206,10 @@ class _AppointmentsPageState extends State<AppointmentsPage>
             onPressed: () async {
               Navigator.of(context).pop();
               await appointmentsViewModel.cancelAppointment(
-                appointmentId,
-                doctorId,
-                slotId,
-                Provider.of<SlotViewModel>(context, listen: false),
+                appointmentId: appointmentId,
+                doctorId: doctorId,
+                slotId: slotId,
+                // Provider.of<SlotViewModel>(context, listen: false),
               );
             },
             child: const Text('Tak'),

@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class AuthModel {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final String errorAllFieldsRequired = 'Wszystkie pola są wymagane';
 
   Future<User?> registerUser({
     required String email,
@@ -18,7 +19,7 @@ class AuthModel {
           firstName.isEmpty ||
           lastName.isEmpty ||
           phoneNumber.isEmpty) {
-        throw Exception('Wszystkie pola są wymagane');
+        throw Exception(errorAllFieldsRequired);
       }
 
       final userCredential = await _auth.createUserWithEmailAndPassword(
@@ -52,7 +53,6 @@ class AuthModel {
       );
       return userCredential.user;
     } catch (e) {
-      print('Login error: ${e.toString()}');
       return null;
     }
   }
@@ -61,7 +61,6 @@ class AuthModel {
     try {
       await _auth.signOut();
     } catch (e) {
-      print('Logout error: ${e.toString()}');
       rethrow;
     }
   }
@@ -70,7 +69,6 @@ class AuthModel {
     try {
       await _auth.sendPasswordResetEmail(email: email);
     } catch (e) {
-      print('Reset password error: ${e.toString()}');
       rethrow;
     }
   }

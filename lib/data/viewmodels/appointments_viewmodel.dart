@@ -1,72 +1,72 @@
 import 'package:flutter/material.dart';
-import '../models/appointment_model.dart';
-import '../services/firestore_service.dart';
-import '../viewmodels/slot_viewmodel.dart';
+import 'package:medical_app/data/repositories/appointment_repository.dart';
+import 'package:medical_app/data/models/appointment_model.dart';
 
 class AppointmentsViewModel extends ChangeNotifier {
-  final FirestoreService _firestoreService = FirestoreService();
+  // final FirestoreService _firestoreService = FirestoreService();
+
+  final AppointmentRepository _repository = AppointmentRepository();
+
   List<Appointment> _appointments = [];
-
   List<Appointment> get appointments => _appointments;
-  Appointment? getNextUpcomingAppointment() {
-    final now = DateTime.now();
 
-    final upcomingAppointments = _appointments.where((appointment) {
-      if (appointment.date != null) {
-        final appointmentDate = DateTime.parse(appointment.date!);
-        return appointmentDate.isAfter(now);
-      }
-      return false;
-    }).toList();
+  bool _isLoading = false;
+  bool get isLoading => _isLoading;
 
-    if (upcomingAppointments.isNotEmpty) {
-      upcomingAppointments.sort(
-          (a, b) => DateTime.parse(a.date!).compareTo(DateTime.parse(b.date!)));
-      return upcomingAppointments.first;
-    }
+  // List<Appointment> get upcomingAppointments => _appointments
+  //     .where((appointment) => appointment.status == 'booked')
+  //     .toList();
 
-    return null;
-  }
+  // List<Appointment> get cancelledAppointments => _appointments
+  //     .where((appointment) => appointment.status == 'cancelled')
+  //     .toList();
 
-  List<Appointment> get upcomingAppointments => _appointments
-      .where((appointment) => appointment.status == 'booked')
-      .toList();
+  // List<Appointment> get completedAppointments => _appointments
+  //     .where((appointment) => appointment.status == 'completed')
+  //     .toList();
 
-  List<Appointment> get cancelledAppointments => _appointments
-      .where((appointment) => appointment.status == 'cancelled')
-      .toList();
+  Future<bool> reserveAppointment(
+      {required String slotId,
+      required String doctorId,
+      required String userId}) async {
+    final success = await _repository.createAppointment(
+      slotId: slotId,
+      doctorId: doctorId,
+      userId: userId,
+    );
 
-  List<Appointment> get completedAppointments => _appointments
-      .where((appointment) => appointment.status == 'completed')
-      .toList();
-
-  Future<void> fetchAppointments(String userId) async {
-    try {
-      print('Ładowanie wizyt dla użytkownika: $userId');
-      _appointments = await _firestoreService.fetchAppointmentsByUserId(userId);
-      print('Załadowano ${_appointments.length} wizyt.');
+    if (success) {
+      await fetchAppointments(userId);
       notifyListeners();
+    }
+    return success;
+  }
+
+  Future<void> fetchAppointments(String patientId) async {
+    _isLoading = true;
+    notifyListeners();
+    try {
+      _appointments = await _repository.getAppointments(patientId);
     } catch (e) {
-      print('Błąd podczas pobierania wizyt: $e');
+      debugPrint('Błąd podczas pobierania wizyt: $e');
+    } finally {
+      _isLoading = false;
+      notifyListeners();
     }
   }
 
-  Future<void> cancelAppointment(String appointmentId, String doctorId,
-      String slotId, SlotViewModel slotViewModel) async {
+  Future<void> cancelAppointment(
+      {required String appointmentId,
+      required String doctorId,
+      required String slotId}) async {
     try {
-      await _firestoreService.cancelAppointment(
-          appointmentId, doctorId, slotId);
+      await _repository.cancelAppointment(
+          appointmentId: appointmentId, doctorId: doctorId, slotId: slotId);
 
-      // Usuń wizytę z listy lokalnej
-      _appointments
+      appointments
           .removeWhere((appointment) => appointment.id == appointmentId);
-
-      // Przywróć dostępność slotu i odśwież widok
-      await slotViewModel.restoreSlotAvailability(slotId, doctorId);
-
-      notifyListeners(); // Powiadomienie widoku o zmianach
     } catch (e) {
-      print('Błąd podczas anulowania wizyty: $e');
+      print('Błąd podczas odwoływania wizyty: $e');
     }
   }
 }
