@@ -296,13 +296,13 @@ class _DashboardPageState extends State<DashboardPage> {
               Navigator.of(context).pop();
               final appointmentsViewModel =
                   Provider.of<AppointmentsViewModel>(context, listen: false);
-              final slotViewModel =
-                  Provider.of<SlotViewModel>(context, listen: false);
+              // final slotViewModel =
+              //     Provider.of<SlotViewModel>(context, listen: false);
               appointmentsViewModel.cancelAppointment(
-                appointmentId,
-                doctorId,
-                slotId,
-                slotViewModel,
+                appointmentId: appointmentId,
+                doctorId: doctorId,
+                slotId: slotId,
+                // slotViewModel,
               );
             },
             style: ElevatedButton.styleFrom(

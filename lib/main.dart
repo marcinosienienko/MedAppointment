@@ -18,6 +18,7 @@ import 'package:medical_app/data/viewmodels/user_viewmodel.dart';
 import 'package:medical_app/data/viewmodels/appointments_viewmodel.dart';
 import 'package:medical_app/presentation/pages/prescriptions_page.dart';
 import 'package:medical_app/presentation/pages/referrals_page.dart';
+import 'package:medical_app/data/services/secure_encryption_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,6 +26,10 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   await initializeDateFormatting('pl_PL', null);
+
+  final encryptionService = SecureEncryptionService();
+
+  await encryptionService.saveAESKeyAndIV();
 
   runApp(
     MultiProvider(

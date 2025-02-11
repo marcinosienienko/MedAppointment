@@ -23,14 +23,14 @@ class LoginPage extends StatelessWidget {
             child: Column(
               children: [
                 const Text(
-                  'Logowanie',
+                  'Zaloguj się\ndo przychodni',
                   style: TextStyle(
-                    fontSize: 28,
+                    fontSize: 50,
                     fontWeight: FontWeight.bold,
                     color: Colors.blue,
                   ),
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 60),
                 Consumer<LoginViewModel>(
                   builder: (context, viewModel, child) {
                     return Form(

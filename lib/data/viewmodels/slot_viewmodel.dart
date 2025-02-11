@@ -47,9 +47,6 @@ class SlotViewModel extends ChangeNotifier {
   Future<bool> reserveSlot(
       String slotId, String doctorId, String userId) async {
     try {
-      print('Rozpoczęto rezerwację slotu: $slotId');
-
-      // Aktualizacja slotu w Firestore
       await _db
           .collection('doctors')
           .doc(doctorId)
@@ -57,11 +54,8 @@ class SlotViewModel extends ChangeNotifier {
           .doc(slotId)
           .update({'status': 'booked'});
 
-      print('Zaktualizowano status slotu.');
-
-      // Dodanie wizyty do Firestore
       final appointment = {
-        'doctorId': doctorId,
+        'doctorName': doctorId,
         'userId': userId,
         'slotId': slotId,
         'dateTime': DateTime.now().toIso8601String(),
@@ -69,9 +63,7 @@ class SlotViewModel extends ChangeNotifier {
       };
 
       await _db.collection('appointments').add(appointment);
-      print('Dodano wizytę do kolekcji appointments.');
 
-      // Lokalna aktualizacja slotów
       _allSlots = _allSlots.map((slot) {
         if (slot.id == slotId) {
           return slot.copyWith(status: 'booked');
@@ -84,7 +76,6 @@ class SlotViewModel extends ChangeNotifier {
 
       return true;
     } catch (e) {
-      print('Błąd podczas rezerwacji slotu: $e');
       return false;
     }
   }
@@ -94,15 +85,9 @@ class SlotViewModel extends ChangeNotifier {
       _currentDoctor = await fetchDoctorById(doctorId);
       final slots = await fetchSlotsByDoctorId(doctorId);
       setSlots(slots);
-
-      // Debugowanie
-      print('Lekarz: ${_currentDoctor?.name}');
-      print(
-          'Specjalizacja: ${_currentDoctor?.specialization?.name ?? "Brak specjalizacji"}');
-
       notifyListeners();
     } catch (e) {
-      print('Błąd podczas pobierania danych lekarza lub slotów: $e');
+      debugPrint('Błąd podczas pobierania danych lekarza: $e');
     }
   }
 
@@ -136,6 +121,45 @@ class SlotViewModel extends ChangeNotifier {
       print('Błąd podczas pobierania danych lekarza: $e');
     }
     return null;
+  }
+
+  Future<bool> confirmReservation(
+      BuildContext context, String userId, String doctorId) async {
+    if (selectedSlot == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Wybierz slot przed rezerwacją.')),
+      );
+      return false;
+    }
+
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Potwierdź rezerwację'),
+        content: Text('Czy na pewno chcesz zarezerwować wizytę?'),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Anuluj')),
+          TextButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('Potwierdź')),
+        ],
+      ),
+    );
+
+    if (confirm == true) {
+      final success = await reserveSlot(selectedSlot!.id, doctorId, userId);
+      final message = success
+          ? 'Wizyta zarezerwowana!'
+          : 'Nie udało się zarezerwować wizyty.';
+
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(message)));
+      return success;
+    }
+
+    return false;
   }
 
   Future<List<Slot>> fetchSlotsByDoctorId(String doctorId) async {

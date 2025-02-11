@@ -22,21 +22,37 @@ class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController _confirmPasswordController =
       TextEditingController();
 
+  Future<void> _handleRegister() async {
+    final registerViewModel =
+        Provider.of<RegisterViewModel>(context, listen: false);
+
+    if (_formKey.currentState!.validate()) {
+      final isSuccess = await registerViewModel.registerUser();
+
+      if (!mounted) return;
+
+      if (isSuccess) {
+        registerViewModel.resetForm();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(registerViewModel.successMessage)),
+        );
+        Navigator.pushReplacementNamed(context, '/login');
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(registerViewModel.errorMessage ??
+                registerViewModel.errorRegistration),
+          ),
+        );
+      }
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     final registerViewModel =
         Provider.of<RegisterViewModel>(context, listen: false);
-
-    // Initialize controller values based on ViewModel
-    _firstNameController.text = registerViewModel.firstName ?? '';
-    _lastNameController.text = registerViewModel.lastName ?? '';
-    _emailController.text = registerViewModel.email ?? '';
-    _phoneController.text = registerViewModel.phoneNumber ?? '';
-    _passwordController.text = registerViewModel.password ?? '';
-    _confirmPasswordController.text = registerViewModel.confirmPassword ?? '';
-
-    // Bind controllers to ViewModel methods
     _firstNameController.addListener(() {
       registerViewModel.setFirstName(_firstNameController.text);
     });
@@ -139,26 +155,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         ),
                       const SizedBox(height: 8),
                       PrimaryButton(
-                        onPressed: () async {
-                          if (_formKey.currentState!.validate()) {
-                            await registerViewModel.registerUser();
-
-                            if (registerViewModel.errorMessage == null) {
-                              registerViewModel.resetForm();
-                              registerViewModel.isLoading = false;
-                              if (context.mounted) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text(
-                                        'Rejestracja zakończona sukcesem!'),
-                                  ),
-                                );
-                                Navigator.pushReplacementNamed(
-                                    context, '/login');
-                              }
-                            }
-                          }
-                        },
+                        onPressed: _handleRegister,
                         text: registerViewModel.isLoading
                             ? 'Proszę czekać...'
                             : 'Zarejestruj',

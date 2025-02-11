@@ -48,6 +48,21 @@ class FirestoreService {
     }
   }
 
+  Future<void> createAppointment(appointment) async {
+    await _db.collection('appointments').add(appointment.toMap());
+  }
+
+  Future updateAppointment(Appointment appointment) async {
+    await _db
+        .collection('appointments')
+        .doc(appointment.id)
+        .update(appointment.toJson());
+  }
+
+  Future<void> deleteAppointment(Appointment appointment) async {
+    await _db.collection('appointments').doc(appointment.id).delete();
+  }
+
   Future<List<Appointment>> fetchAppointmentsByUserId(String userId) async {
     try {
       final snapshot = await _db
@@ -93,50 +108,6 @@ class FirestoreService {
     }
   }
 
-  Future<Appointment> fetchAppointmentWithDetails(
-      Map<String, dynamic> data, String documentId) async {
-    final String? doctorId = data['doctorId'] as String?;
-    final String? patientId = data['patientId'] as String?;
-
-    String? doctorName;
-    String? patientName;
-
-    // Pobranie imienia doktora
-    if (doctorId != null) {
-      final doctorSnapshot =
-          await _db.collection('doctors').doc(doctorId).get();
-      if (doctorSnapshot.exists) {
-        doctorName = doctorSnapshot.data()?['name'] as String?;
-      }
-    }
-
-    // Pobranie imienia pacjenta
-    if (patientId != null) {
-      final patientSnapshot =
-          await _db.collection('users').doc(patientId).get();
-      if (patientSnapshot.exists) {
-        patientName = patientSnapshot.data()?['name'] as String?;
-      }
-    }
-
-    // Utworzenie obiektu Appointment
-    return Appointment(
-      id: documentId,
-      date: data['date'] as String?,
-      doctorId: doctorId,
-      patientId: patientId,
-      slotId: data['slotId'] as String?,
-      startTime: data['startTime'] as String?,
-      endTime: data['endTime'] as String?,
-      doctorName: doctorName,
-      patientName: patientName,
-      status: data['status'] as String? ?? 'pending',
-      createdAt: data['createdAt'] != null
-          ? (data['createdAt'] as Timestamp).toDate()
-          : null,
-    );
-  }
-
   Future<void> cancelAppointment(
       String appointmentId, String doctorId, String slotId) async {
     try {
@@ -179,3 +150,47 @@ class FirestoreService {
     }
   }
 }
+
+ // Future<Appointment> fetchAppointmentWithDetails(
+  //     Map<String, dynamic> data, String documentId) async {
+  //   final String? doctorId = data['doctorId'] as String?;
+  //   final String? patientId = data['patientId'] as String?;
+
+  //   String? doctorName;
+  //   String? patientName;
+
+  //   // Pobranie imienia doktora
+  //   if (doctorId != null) {
+  //     final doctorSnapshot =
+  //         await _db.collection('doctors').doc(doctorId).get();
+  //     if (doctorSnapshot.exists) {
+  //       doctorName = doctorSnapshot.data()?['name'] as String?;
+  //     }
+  //   }
+
+  //   // Pobranie imienia pacjenta
+  //   if (patientId != null) {
+  //     final patientSnapshot =
+  //         await _db.collection('users').doc(patientId).get();
+  //     if (patientSnapshot.exists) {
+  //       patientName = patientSnapshot.data()?['name'] as String?;
+  //     }
+  //   }
+
+  //   // Utworzenie obiektu Appointment
+  //   return Appointment(
+  //     id: documentId,
+  //     date: data['date'] as String?,
+  //     doctorId: doctorId,
+  //     patientId: patientId,
+  //     slotId: data['slotId'] as String?,
+  //     startTime: data['startTime'] as String?,
+  //     endTime: data['endTime'] as String?,
+  //     doctorName: doctorName,
+  //     patientName: patientName,
+  //     status: data['status'] as String? ?? 'pending',
+  //     createdAt: data['createdAt'] != null
+  //         ? (data['createdAt'] as Timestamp).toDate()
+  //         : null,
+  //   );
+  // }
