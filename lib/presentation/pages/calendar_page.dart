@@ -38,7 +38,7 @@ class _CalendarPageState extends State<CalendarPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Kalendarz wizyt'),
+        title: Text('Kalendarz wizyt Dr ${slotViewModel.currentDoctor?.name}'),
       ),
       body: Column(
         children: [

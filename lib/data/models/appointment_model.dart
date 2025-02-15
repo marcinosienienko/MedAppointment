@@ -8,8 +8,8 @@ class Appointment {
   final String? slotId;
   final String? startTime;
   final String? endTime;
-  final String? doctorName; // Dodane pole
-  final String? patientName; // Dodane pole
+  final String? doctorName;
+  final String? patientName;
   final String status;
   final DateTime? createdAt;
   final String? specialization;
@@ -29,7 +29,7 @@ class Appointment {
     this.createdAt,
   });
 
-  // Metoda do tworzenia obiektu Appointment z mapy danych (np. z Firestore)
+  /// ✅ Tworzenie obiektu z Firestore (Firestore → Model)
   factory Appointment.fromMap(Map<String, dynamic> data, String documentId) {
     return Appointment(
       id: documentId,
@@ -39,10 +39,9 @@ class Appointment {
       slotId: data['slotId'] as String?,
       startTime: data['startTime'] as String?,
       endTime: data['endTime'] as String?,
-      doctorName: data['doctorName']
-          as String?, // Dla uproszczenia, jeśli dane są już w dokumentach
-      patientName: data['patientName'] as String?,
-      specialization: data['specialization'] as String?,
+      doctorName: data['doctorName'] as String? ?? '', // ✅ Obsługuje null
+      patientName: data['patientName'] as String? ?? '',
+      specialization: data['specialization'] as String? ?? '',
       status: data['status'] as String? ?? 'pending',
       createdAt: data['createdAt'] != null
           ? (data['createdAt'] as Timestamp).toDate()
@@ -50,7 +49,7 @@ class Appointment {
     );
   }
 
-  // Metoda do konwersji obiektu Appointment na mapę danych (np. do zapisu w Firestore)
+  /// ✅ Konwersja obiektu Appointment na JSON (Model → Firestore)
   Map<String, dynamic> toJson() {
     return {
       'date': date,
@@ -59,35 +58,35 @@ class Appointment {
       'slotId': slotId,
       'startTime': startTime,
       'endTime': endTime,
-      'doctorName': doctorName,
-      'patientName': patientName,
+      'doctorName': doctorName ?? '', // ✅ Obsługuje null
+      'patientName': patientName ?? '',
+      'specialization': specialization ?? '',
       'status': status,
-      'specialization': specialization,
       'createdAt': createdAt != null ? Timestamp.fromDate(createdAt!) : null,
     };
   }
 
-  // Metoda do tworzenia obiektu Appointment z danych JSON
+  /// ✅ Tworzenie obiektu z JSON (np. REST API)
   factory Appointment.fromJson(Map<String, dynamic> json) {
     return Appointment(
-      id: json['id'] as String,
+      id: json['id'] as String? ?? '', // ✅ Obsługuje null
       date: json['date'] as String?,
       doctorId: json['doctorId'] as String?,
       patientId: json['patientId'] as String?,
       slotId: json['slotId'] as String?,
       startTime: json['startTime'] as String?,
       endTime: json['endTime'] as String?,
-      doctorName: json['doctorName'] as String?,
-      patientName: json['patientName'] as String?,
-      specialization: json['specialization'] as String?,
+      doctorName: json['doctorName'] as String? ?? '',
+      patientName: json['patientName'] as String? ?? '',
+      specialization: json['specialization'] as String? ?? '',
       status: json['status'] as String? ?? 'pending',
       createdAt: json['createdAt'] != null
-          ? DateTime.parse(json['createdAt'] as String)
+          ? DateTime.tryParse(json['createdAt'] as String)
           : null,
     );
   }
 
-  // Metoda copyWith do tworzenia kopii obiektu z modyfikacjami
+  /// ✅ Tworzenie kopii obiektu z modyfikacjami (Immutable Copy)
   Appointment copyWith({
     String? id,
     String? date,
