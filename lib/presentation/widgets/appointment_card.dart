@@ -21,7 +21,7 @@ class AppointmentCard extends StatelessWidget {
         final DateTime date = DateTime.parse(appointment.date!);
         formattedDate = DateFormat('dd.MM.yyyy HH:mm', 'pl_PL').format(date);
       } catch (e) {
-        print('Błąd podczas formatowania daty: $e');
+        print('Błąd podczas formatoawania daty: $e');
       }
     }
 
