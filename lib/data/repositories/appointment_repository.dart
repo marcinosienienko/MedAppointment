@@ -6,8 +6,14 @@ class AppointmentRepository {
   final FirestoreService _firestoreService = FirestoreService();
   final _db = FirebaseFirestore.instance;
 
-  Future<List<Appointment>> getAppointments(String userId) {
-    return _firestoreService.fetchAppointmentsByUserId(userId);
+  Future<List<Appointment>> getAppointments(String userId) async {
+    final snapshot = await _db
+        .collection('appointments')
+        .where('userId', isEqualTo: userId)
+        .get();
+    return snapshot.docs
+        .map((doc) => Appointment.fromMap(doc.data(), doc.id))
+        .toList();
   }
 
   Future<bool> createAppointment(
