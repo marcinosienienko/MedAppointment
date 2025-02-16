@@ -28,11 +28,13 @@ class Doctor {
     this.slots = const [],
   });
 
-  factory Doctor.fromMap(Map<String, dynamic> data, String documentId) {
+  factory Doctor.fromMap(Map<String, dynamic> data, String documentId,
+      {Specialization? specialization}) {
     return Doctor(
       id: documentId,
       name: data['name'] ?? 'Nieznany lekarz',
       specializationId: data['specializationId'] ?? '',
+      specialization: specialization,
       pwzNumber: data['pwzNumber'] ?? '',
       description: data['description'],
       avatarUrl: data['avatarUrl'],

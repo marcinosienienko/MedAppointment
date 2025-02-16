@@ -40,21 +40,33 @@ class AppointmentsViewModel extends ChangeNotifier {
     try {
       List<Appointment> fetchedAppointments =
           await _repository.getAppointments(userId);
-      final doctorRepo = DoctorRepository();
+      final doctorRepo = DoctorRepository(); // Repozytorium lekarzy
 
       List<Appointment> updatedAppointments = [];
 
       for (var appointment in fetchedAppointments) {
-        final doctor = await doctorRepo.fetchDoctorById(appointment.doctorId!);
-        if (doctor != null) {
-          final updatedAppointment = appointment.copyWith(
-            doctorName: doctor.name,
-            specialization: doctor.specialization?.name ?? 'Brak specjalizacji',
-          );
-          updatedAppointments.add(updatedAppointment);
-        } else {
+        if (appointment.doctorId == null || appointment.slotId == null) {
+          debugPrint(
+              "⚠️ Brak doctorId lub slotId dla wizyty: ${appointment.id}");
           updatedAppointments.add(appointment);
+          continue;
         }
+
+        // Pobierz lekarza i slot
+        final doctor = await doctorRepo.fetchDoctorById(appointment.doctorId!);
+        final slot = await doctorRepo.fetchSlotDetails(
+            appointment.doctorId!, appointment.slotId!);
+        debugPrint("📡 Pobieranie slotu: ${appointment.slotId}");
+        debugPrint("📡 Slot startTime: ${slot?.startTime}");
+
+        final updatedAppointment = appointment.copyWith(
+          doctorName: doctor?.name ?? "Nieznany lekarz",
+          specialization: doctor?.specialization?.name ?? "Brak specjalizacji",
+          date: slot?.date,
+          startTime: slot?.startTime,
+        );
+
+        updatedAppointments.add(updatedAppointment);
       }
 
       _appointments = updatedAppointments;
@@ -78,12 +90,12 @@ class AppointmentsViewModel extends ChangeNotifier {
         slotId: slotId,
       );
 
-      // Usunięcie wizyty z lokalnej listy
+      // Usuń odwołaną wizytę z lokalnej listy
       _appointments
           .removeWhere((appointment) => appointment.id == appointmentId);
       notifyListeners();
     } catch (e) {
-      print('Błąd podczas odwoływania wizyty: $e');
+      print('❌ Błąd podczas odwoływania wizyty: $e');
     }
   }
 

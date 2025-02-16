@@ -16,11 +16,33 @@ class AppointmentRepository {
         .toList();
   }
 
-  Future<bool> createAppointment(
-      {required String slotId,
-      required String doctorId,
-      required String userId}) async {
+  Future<bool> createAppointment({
+    required String slotId,
+    required String doctorId,
+    required String userId,
+  }) async {
     try {
+      final slotDoc = await _db
+          .collection('doctors')
+          .doc(doctorId)
+          .collection('slots')
+          .doc(slotId)
+          .get();
+
+      if (!slotDoc.exists) {
+        print('❌ Błąd: Slot nie istnieje!');
+        return false;
+      }
+
+      final slotData = slotDoc.data();
+      final String? startTime = slotData?['startTime'];
+      final String? date = slotData?['date'];
+
+      if (startTime == null || date == null) {
+        print('❌ Błąd: Slot nie zawiera startTime lub date!');
+        return false;
+      }
+
       await _db
           .collection('doctors')
           .doc(doctorId)
@@ -32,13 +54,17 @@ class AppointmentRepository {
         'doctorId': doctorId,
         'userId': userId,
         'slotId': slotId,
-        'dateTime': DateTime.now().toIso8601String(),
+        'date': date, // Dodajemy date
+        'startTime': startTime, // Dodajemy startTime
         'status': 'booked',
+        'createdAt': DateTime.now().toIso8601String(),
       };
+
       await _db.collection('appointments').add(appointment);
+      print('✅ Wizyta utworzona: $appointment');
       return true;
     } catch (e) {
-      print('Błąd podczas tworzenia wizyty: $e');
+      print('❌ Błąd podczas tworzenia wizyty: $e');
       return false;
     }
   }

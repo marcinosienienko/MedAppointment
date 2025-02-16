@@ -16,15 +16,15 @@ class AppointmentCard extends StatelessWidget {
   Widget build(BuildContext context) {
     String formattedDate = 'Brak terminu';
 
-    if (appointment.date != null) {
+    if (appointment.date != null && appointment.startTime != null) {
       try {
-        final DateTime date = DateTime.parse(appointment.date!);
+        final DateTime date =
+            DateTime.parse("${appointment.date} ${appointment.startTime}");
         formattedDate = DateFormat('dd.MM.yyyy HH:mm', 'pl_PL').format(date);
       } catch (e) {
-        print('Błąd podczas formatoawania daty: $e');
+        debugPrint('Błąd parsowania daty: $e');
       }
     }
-
     return Card(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12.0),
