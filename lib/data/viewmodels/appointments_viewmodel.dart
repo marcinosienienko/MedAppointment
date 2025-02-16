@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:medical_app/data/models/slot_model.dart';
 import 'package:medical_app/data/repositories/appointment_repository.dart';
 import 'package:medical_app/data/models/appointment_model.dart';
 import 'package:medical_app/data/repositories/doctor_repository.dart';
 import 'package:medical_app/data/viewmodels/slot_viewmodel.dart';
 import 'package:medical_app/presentation/widgets/confirmation_dialog.dart';
+import 'package:provider/provider.dart';
+import 'package:table_calendar/table_calendar.dart';
 
 class AppointmentsViewModel extends ChangeNotifier {
   final AppointmentRepository _repository = AppointmentRepository();
@@ -140,6 +143,9 @@ class AppointmentsViewModel extends ChangeNotifier {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => ConfirmationDialog(
+        title: 'Potwierdź rezerwację',
+        message: 'Czy na pewno chcesz zarezerwować wizytę?',
+        isCancellation: false,
         slot: slotViewModel.selectedSlot!,
         doctorName: slotViewModel.currentDoctor!.name,
         specialization: slotViewModel.currentDoctor!.specialization?.name ??
@@ -171,6 +177,57 @@ class AppointmentsViewModel extends ChangeNotifier {
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Błąd: ${e.toString()}')),
+      );
+    }
+  }
+
+  Future<void> handleAppointmentCancelation(
+      BuildContext context,
+      Appointment appointment,
+      String userId,
+      SlotViewModel slotViewModel) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => ConfirmationDialog(
+        title: 'Anulowanie wizyty',
+        message: 'Czy na pewno chcesz anulować wizytę?',
+        isCancellation: true,
+        doctorName: appointment.doctorName ?? '',
+        specialization: appointment.specialization ?? 'Brak specjalizacji',
+        slot: Slot(
+          id: appointment.slotId?.toString() ?? 'Brak slotId',
+          date: appointment.date ?? 'Brak daty',
+          startTime: appointment.startTime ?? 'Brak godziny',
+          endTime: appointment.endTime ?? 'Brak godziny',
+          status: 'available',
+        ),
+        date: '',
+      ),
+    );
+
+    if (confirm != true) return;
+
+    try {
+      // ✅ Pobierz instancję `AppointmentsViewModel`
+      final appointmentsViewModel =
+          Provider.of<AppointmentsViewModel>(context, listen: false);
+
+      // ✅ Anulowanie wizyty w Firestore
+      await appointmentsViewModel.cancelAppointment(
+        appointmentId: appointment.id,
+        doctorId: appointment.doctorId!,
+        slotId: appointment.slotId!,
+      );
+
+      // ✅ Odświeżenie listy wizyt
+      await appointmentsViewModel.fetchAppointments(userId);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Wizyta została anulowana.')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('❌ Błąd podczas anulowania: ${e.toString()}')),
       );
     }
   }

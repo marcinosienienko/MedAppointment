@@ -30,7 +30,6 @@ class AppointmentRepository {
           .get();
 
       if (!slotDoc.exists) {
-        print('❌ Błąd: Slot nie istnieje!');
         return false;
       }
 
@@ -39,7 +38,6 @@ class AppointmentRepository {
       final String? date = slotData?['date'];
 
       if (startTime == null || date == null) {
-        print('❌ Błąd: Slot nie zawiera startTime lub date!');
         return false;
       }
 
@@ -54,17 +52,15 @@ class AppointmentRepository {
         'doctorId': doctorId,
         'userId': userId,
         'slotId': slotId,
-        'date': date, // Dodajemy date
-        'startTime': startTime, // Dodajemy startTime
+        'date': date,
+        'startTime': startTime,
         'status': 'booked',
         'createdAt': DateTime.now().toIso8601String(),
       };
 
       await _db.collection('appointments').add(appointment);
-      print('✅ Wizyta utworzona: $appointment');
       return true;
     } catch (e) {
-      print('❌ Błąd podczas tworzenia wizyty: $e');
       return false;
     }
   }
@@ -88,7 +84,6 @@ class AppointmentRepository {
           .doc(slotId)
           .update({'status': 'available'});
     } catch (e) {
-      print('Błąd podczas odwoływania wizyty: $e');
       rethrow;
     }
   }

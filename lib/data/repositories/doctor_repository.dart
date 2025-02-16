@@ -14,26 +14,17 @@ class DoctorRepository {
 
       for (var doc in snapshot.docs) {
         final data = doc.data();
-        final specializationId = data['specializationId'] as String?;
+        final specialization =
+            await _fetchSpecialization(data['specializationId']);
 
-        Specialization? specialization;
-        if (specializationId != null) {
-          final specializationDoc = await _db
-              .collection('specializations')
-              .doc(specializationId)
-              .get();
-
-          if (specializationDoc.exists) {
-            specialization = Specialization.fromMap(
-                specializationDoc.data()!, specializationDoc.id);
-          }
-        }
         doctors.add(Doctor.fromMap(data, doc.id)
             .copyWith(specialization: specialization));
       }
+
       return doctors;
-    } catch (e) {
+    } catch (e, stackTrace) {
       debugPrint('Błąd podczas pobierania lekarzy: $e');
+      debugPrint(stackTrace.toString());
       return [];
     }
   }
@@ -47,15 +38,15 @@ class DoctorRepository {
           .doc(slotId)
           .get();
 
-      if (doc.exists) {
-        final data = doc.data();
-        print("📡 Dane slotu z Firestore dla ${doc.id}: $data"); // 🔥 DEBUG
-        return data != null ? Slot.fromMap(data, doc.id) : null;
+      if (doc.exists && doc.data() != null) {
+        return Slot.fromMap(doc.data()!, doc.id);
       } else {
-        print("❌ Slot nie znaleziony w Firestore!");
+        debugPrint(
+            'Slot $slotId nie istnieje w bazie danych lekarza $doctorId');
       }
-    } catch (e) {
-      print('❌ Błąd podczas pobierania szczegółów slotu: $e');
+    } catch (e, stackTrace) {
+      debugPrint('Błąd podczas pobierania szczegółów slotu: $slotId: $e');
+      debugPrint(stackTrace.toString());
     }
     return null;
   }
@@ -63,28 +54,39 @@ class DoctorRepository {
   Future<Doctor?> fetchDoctorById(String doctorId) async {
     try {
       final doc = await _db.collection('doctors').doc(doctorId).get();
-      if (!doc.exists) return null; // Jeśli nie ma lekarza, zwróć null
-
-      final data = doc.data();
-      if (data == null) return null;
-
-      final specializationId = data['specializationId'] as String?;
-      Specialization? specialization;
-
-      if (specializationId != null && specializationId.isNotEmpty) {
-        final specializationDoc =
-            await _db.collection('specializations').doc(specializationId).get();
-
-        if (specializationDoc.exists) {
-          specialization = Specialization.fromMap(
-              specializationDoc.data()!, specializationDoc.id);
-        }
+      if (!doc.exists || doc.data() == null) {
+        debugPrint('Nie znaleziono lekarza o id: $doctorId');
+        return null;
       }
 
-      return Doctor.fromMap(data, doc.id, specialization: specialization);
-    } catch (e) {
-      debugPrint('Błąd pobierania lekarza: $e');
+      final data = doc.data()!;
+      final specialization =
+          await _fetchSpecialization(data['specializationId']);
+
+      return Doctor.fromMap(data, doc.id)
+          .copyWith(specialization: specialization);
+    } catch (e, stackTrace) {
+      debugPrint('Błąd podczas pobierania lekarza: $doctorId: $e');
+      debugPrint(stackTrace.toString());
       return null;
     }
+  }
+
+  Future<Specialization?> _fetchSpecialization(String? specializationId) async {
+    if (specializationId == null || specializationId.isEmpty) return null;
+
+    try {
+      final doc =
+          await _db.collection('specializations').doc(specializationId).get();
+
+      if (doc.exists && doc.data() != null) {
+        return Specialization.fromMap(doc.data()!, doc.id);
+      }
+    } catch (e, stackTrace) {
+      debugPrint(
+          'Błąd podczas pobierania specjalizacji: $specializationId: $e ');
+      debugPrint(stackTrace.toString());
+    }
+    return null;
   }
 }
