@@ -70,14 +70,17 @@ class _DashboardPageState extends State<DashboardPage> {
   Widget _buildDashboardContent(AppointmentsViewModel appointmentsViewModel) {
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
-      child: Column(
-        children: [
-          const BanerWidget(),
-          const SizedBox(height: 16.0),
-          _buildUpcomingAppointment(appointmentsViewModel),
-          const SizedBox(height: 16.0),
-          const DashboardCards(),
-        ],
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+        child: Column(
+          children: [
+            const BanerWidget(),
+            const SizedBox(height: 16.0),
+            _buildUpcomingAppointment(appointmentsViewModel),
+            const SizedBox(height: 16.0),
+            const DashboardCards(),
+          ],
+        ),
       ),
     );
   }

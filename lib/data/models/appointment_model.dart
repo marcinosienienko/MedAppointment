@@ -29,7 +29,6 @@ class Appointment {
     this.createdAt,
   });
 
-  /// ✅ Tworzenie obiektu z Firestore (Firestore → Model)
   factory Appointment.fromMap(Map<String, dynamic> data, String documentId) {
     return Appointment(
       id: documentId,
@@ -39,13 +38,15 @@ class Appointment {
       slotId: data['slotId'] as String?,
       startTime: data['startTime'] as String?,
       endTime: data['endTime'] as String?,
-      doctorName: data['doctorName'] as String? ?? '', // ✅ Obsługuje null
+      doctorName: data['doctorName'] as String? ?? '',
       patientName: data['patientName'] as String? ?? '',
       specialization: data['specialization'] as String? ?? '',
       status: data['status'] as String? ?? 'pending',
-      createdAt: data['createdAt'] != null
+      createdAt: data['createdAt'] is Timestamp
           ? (data['createdAt'] as Timestamp).toDate()
-          : null,
+          : (data['createdAt'] is String
+              ? DateTime.tryParse(data['createdAt'] as String)
+              : null), // ✅ Obsługuje zarówno Timestamp, jak i String
     );
   }
 
