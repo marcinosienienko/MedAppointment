@@ -2,16 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:medical_app/data/models/slot_model.dart';
 
 class ConfirmationDialog extends StatelessWidget {
+  final String title;
+  final String message;
+  final bool isCancellation;
   final Slot slot;
   final String doctorName;
   final String specialization;
+  final String date;
 
   const ConfirmationDialog({
     Key? key,
+    required this.title,
+    required this.message,
+    required this.isCancellation,
     required this.doctorName,
     required this.slot,
     required this.specialization,
-    required String date,
+    required this.date,
   }) : super(key: key);
 
   @override
@@ -22,7 +29,7 @@ class ConfirmationDialog extends StatelessWidget {
         children: [
           Icon(Icons.info_outline, color: Colors.blue),
           const SizedBox(width: 8),
-          const Text('Potwierdź rezerwację'),
+          Text(title),
         ],
       ),
       content: Column(

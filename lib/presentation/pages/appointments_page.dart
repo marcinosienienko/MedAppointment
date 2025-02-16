@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:medical_app/data/models/appointment_model.dart';
 import 'package:medical_app/data/viewmodels/appointments_viewmodel.dart';
+import 'package:medical_app/data/viewmodels/slot_viewmodel.dart';
 import 'package:medical_app/data/viewmodels/user_viewmodel.dart';
 import 'package:medical_app/presentation/widgets/appointment_card.dart';
 import 'package:provider/provider.dart';
@@ -52,40 +53,21 @@ class _AppointmentsPageState extends State<AppointmentsPage> {
 
         return AppointmentCard(
           appointment: appointment,
-          onCancel: () => _cancelAppointment(context, appointment.id!,
-              appointment.doctorId!, appointment.slotId!),
+          onCancel: () {
+            final userId = Provider.of<UserViewModel>(context, listen: false)
+                .currentUser
+                ?.id;
+            final slotViewModel =
+                Provider.of<SlotViewModel>(context, listen: false);
+
+            if (userId != null) {
+              Provider.of<AppointmentsViewModel>(context, listen: false)
+                  .handleAppointmentCancelation(
+                      context, appointment, userId, slotViewModel);
+            }
+          },
         );
       },
-    );
-  }
-
-  void _cancelAppointment(BuildContext context, String appointmentId,
-      String doctorId, String slotId) {
-    final appointmentsViewModel =
-        Provider.of<AppointmentsViewModel>(context, listen: false);
-
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Anuluj wizytę'),
-        content: const Text('Czy na pewno chcesz anulować tę wizytę?'),
-        actions: [
-          TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Nie')),
-          ElevatedButton(
-            onPressed: () async {
-              Navigator.of(context).pop();
-              await appointmentsViewModel.cancelAppointment(
-                appointmentId: appointmentId,
-                doctorId: doctorId,
-                slotId: slotId,
-              );
-            },
-            child: const Text('Tak'),
-          ),
-        ],
-      ),
     );
   }
 }
