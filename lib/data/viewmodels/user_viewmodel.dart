@@ -94,9 +94,69 @@ class UserViewModel extends ChangeNotifier {
     }
   }
 
+  @override
+  void dispose() {
+    peselController.dispose();
+    super.dispose();
+  }
+}
+
+// to do 
+/*  import 'package:flutter/material.dart';
+import '../../../core/repositories/user_repository.dart';
+import '../models/user_model.dart';
+
+class UserViewModel extends ChangeNotifier {
+  final UserRepository _userRepository;
+  UserModel? _currentUser;
+  final peselController = TextEditingController();
+
+  UserModel? get currentUser => _currentUser;
+
+  UserViewModel(this._userRepository);
+
+  Future<void> fetchUserData() async {
+    try {
+      _currentUser = await _userRepository.fetchUserData();
+      peselController.text = _currentUser?.pesel ?? '';
+      notifyListeners();
+    } catch (e) {
+      debugPrint("Błąd pobierania użytkownika: $e");
+    }
+  }
+
+  Future<void> updateUserProfile({
+    String? firstName,
+    String? lastName,
+    String? phoneNumber,
+    String? street,
+    String? houseNumber,
+    String? apartmentNumber,
+    String? city,
+    String? pesel,
+  }) async {
+    try {
+      if (_currentUser == null) return;
+      await _userRepository.updateUserProfile(
+        userId: _currentUser!.id,
+        firstName: firstName,
+        lastName: lastName,
+        phoneNumber: phoneNumber,
+        street: street,
+        houseNumber: houseNumber,
+        apartmentNumber: apartmentNumber,
+        city: city,
+        pesel: pesel,
+      );
+      await fetchUserData(); // Odśwież dane po aktualizacji
+    } catch (e) {
+      debugPrint("Błąd aktualizacji użytkownika: $e");
+    }
+  }
+
   Future<void> logout() async {
     try {
-      await _auth.signOut();
+      await _userRepository.logout();
       _currentUser = null;
       notifyListeners();
     } catch (e) {
@@ -110,3 +170,27 @@ class UserViewModel extends ChangeNotifier {
     super.dispose();
   }
 }
+void main() {
+  runApp(
+    MultiProvider(
+      providers: [
+        Provider(create: (context) => AuthRepository()),
+        Provider(create: (context) => UserRepository()),
+        ChangeNotifierProvider(
+          create: (context) => AuthViewModel(context.read<AuthRepository>()),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => UserViewModel(context.read<UserRepository>()),
+        ),
+      ],
+      child: MyApp(),
+    ),
+  );
+}
+
+
+
+
+
+
+*/

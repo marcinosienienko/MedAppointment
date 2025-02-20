@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:medical_app/data/models/auth_model.dart';
+import 'package:medical_app/data/repositories/auth_repository.dart';
 
 class AuthViewModel extends ChangeNotifier {
-  final AuthModel _authModel = AuthModel();
+  final AuthRepository _authRepository;
+
+  AuthViewModel(this._authRepository);
 
   bool _isLoading = false;
   String? _errorMessage;
@@ -32,18 +34,17 @@ class AuthViewModel extends ChangeNotifier {
     _setErrorMessage(null);
 
     try {
-      User? user = await _authModel.registerUser(
+      User? user = await _authRepository.registerUser(
         email: email,
         password: password,
         firstName: firstName,
         lastName: lastName,
         phoneNumber: phoneNumber,
       );
-
       _setLoading(false);
       return user != null;
     } catch (e) {
-      _setErrorMessage('Błąd rejestracji: ${e.toString()}');
+      _setErrorMessage(e.toString());
       _setLoading(false);
       return false;
     }
@@ -55,32 +56,29 @@ class AuthViewModel extends ChangeNotifier {
   }) async {
     _setLoading(true);
     _setErrorMessage(null);
-
     try {
-      User? user = await _authModel.loginUser(
+      User? user = await _authRepository.loginUser(
         email: email,
         password: password,
       );
-
       _setLoading(false);
       return user != null;
     } catch (e) {
-      _setErrorMessage('Błąd logowania: ${e.toString()}');
+      _setErrorMessage(e.toString());
       _setLoading(false);
       return false;
     }
   }
 
-  /// Wylogowanie użytkownika
   Future<bool> logout() async {
     try {
       _setLoading(true);
       _setErrorMessage(null);
-      await _authModel.logout();
+      await _authRepository.logout();
       _setLoading(false);
       return true;
     } catch (e) {
-      _setErrorMessage('Błąd wylogowania: ${e.toString()}');
+      _setErrorMessage(e.toString());
       _setLoading(false);
       return false;
     }
@@ -90,10 +88,10 @@ class AuthViewModel extends ChangeNotifier {
     try {
       _setLoading(true);
       _setErrorMessage(null);
-      await _authModel.resetPassword(email);
+      await _authRepository.resetPassword(email);
       _setLoading(false);
     } catch (e) {
-      _setErrorMessage('Błąd resetowania hasła: ${e.toString()}');
+      _setErrorMessage(e.toString());
       _setLoading(false);
     }
   }
