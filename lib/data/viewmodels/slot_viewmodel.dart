@@ -70,12 +70,6 @@ class SlotViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  // bool isSameDay(DateTime date1, DateTime date2) {
-  //   return date1.year == date2.year &&
-  //       date1.month == date2.month &&
-  //       date1.day == date2.day;
-  // }
-
   Future<void> restoreSlotAvailalility(String slotId, String doctorId) async {
     await _slotRepository.restoreSlotAvailability(slotId, doctorId);
     _allSlots = _allSlots.map((slot) {
@@ -87,44 +81,4 @@ class SlotViewModel extends ChangeNotifier {
     _filterSlotsBySelectedDay();
     notifyListeners();
   }
-
-  // Future<bool> handleAppointmentReservation(
-  //     BuildContext context, String userId, String doctorId) async {
-  //   if (selectedSlot == null) {
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       const SnackBar(
-  //           content: Text('Wybierz dodstępną godzinę przed rezerwacją.')),
-  //     );
-  //     return false;
-  //   }
-
-  //   final confirm = await showDialog<bool>(
-  //     context: context,
-  //     builder: (context) => AlertDialog(
-  //       title: const Text('Potwierdź rezerwację'),
-  //       content: Text('Czy na pewno chcesz zarezerwować wizytę?'),
-  //       actions: [
-  //         TextButton(
-  //             onPressed: () => Navigator.pop(context, false),
-  //             child: const Text('Anuluj')),
-  //         TextButton(
-  //             onPressed: () => Navigator.pop(context, true),
-  //             child: const Text('Potwierdź')),
-  //       ],
-  //     ),
-  //   );
-
-  //   if (confirm == true) {
-  //     final success = await reserveSlot(selectedSlot!.id, doctorId, userId);
-  //     final message = success
-  //         ? 'Wizyta zarezerwowana!'
-  //         : 'Nie udało się zarezerwować wizyty.';
-
-  //     ScaffoldMessenger.of(context)
-  //         .showSnackBar(SnackBar(content: Text(message)));
-  //     return success;
-  //   }
-
-  //   return false;
-  // }
 }

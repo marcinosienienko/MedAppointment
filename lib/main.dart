@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:medical_app/data/repositories/auth_repository.dart';
 import 'package:medical_app/data/viewmodels/doctor_viewmodel.dart';
 import 'package:medical_app/data/viewmodels/slot_viewmodel.dart';
 import 'package:medical_app/firebase_options.dart';
@@ -35,6 +36,7 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => SlotViewModel()),
+        Provider(create: (context) => AuthRepository()),
         //ChangeNotifierProxyProvider<SlotViewModel, AppointmentsViewModel>(
         //  create: (_) => AppointmentsViewModel(null),
         //  update: (_, slotViewModel, previousAppointmentsViewModel) =>
@@ -46,7 +48,8 @@ void main() async {
             create: (_) => DoctorViewModel()..fetchDoctors()),
         ChangeNotifierProvider(create: (_) => RegisterViewModel()),
         ChangeNotifierProvider(create: (_) => LoginViewModel()),
-        ChangeNotifierProvider(create: (_) => AuthViewModel()),
+        ChangeNotifierProvider(
+            create: (context) => AuthViewModel(context.read<AuthRepository>())),
         ChangeNotifierProvider(create: (_) => UserViewModel()),
         ChangeNotifierProvider(create: (_) => AppointmentsViewModel()),
       ],
