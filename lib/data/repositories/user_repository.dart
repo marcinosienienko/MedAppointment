@@ -3,12 +3,13 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:medical_app/data/models/user_model.dart';
 import 'package:medical_app/data/services/secure_encryption_service.dart';
 
-class UserReposiitory {
+class UserRepository {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final SecureEncryptionService _encryptionService = SecureEncryptionService();
 
   Future<UserModel?> fetchUserData() async {
+    const String passPesel = 'uzupełnij numer PESEL';
     try {
       final user = _auth.currentUser;
       if (user == null) return null;
@@ -16,14 +17,18 @@ class UserReposiitory {
       final doc = await _firestore.collection('users').doc(user.uid).get();
       if (!doc.exists) return null;
 
-      final data = doc.data()!;
-      if (data['pesel'] != null) {
+      final data = doc.data() ?? {};
+
+      if (data.containsKey('pesel') && data['pesel'] is String) {
         try {
           data['pesel'] = await _encryptionService.decryptData(data['pesel']);
         } catch (_) {
-          data['pesel'] = 'usupełnij numer PESEL';
+          data['pesel'] = passPesel;
         }
+      } else {
+        data['pesel'] = passPesel;
       }
+
       return UserModel.fromMap(data, user.uid);
     } catch (e) {
       throw Exception(
@@ -31,16 +36,17 @@ class UserReposiitory {
     }
   }
 
-  Future<void> updateUserProfile(
-      {required String userId,
-      String? firstName,
-      String? lastName,
-      String? phoneNumber,
-      String? street,
-      String? houseNumber,
-      String? appartamentNumber,
-      String? city,
-      String? pesel}) async {
+  Future<void> updateUserProfile({
+    required String userId,
+    String? firstName,
+    String? lastName,
+    String? phoneNumber,
+    String? street,
+    String? houseNumber,
+    String? apartamentNumber,
+    String? city,
+    String? pesel,
+  }) async {
     try {
       final updatedData = <String, dynamic>{};
 
@@ -53,14 +59,14 @@ class UserReposiitory {
       final userDoc = await _firestore.collection('users').doc(userId).get();
       if (!userDoc.exists) return;
 
-      final currentUserData = userDoc.data()!;
+      final currentUserData = userDoc.data() ?? {};
       updateField(firstName, currentUserData['firstName'], 'firstName');
       updateField(lastName, currentUserData['lastName'], 'lastName');
       updateField(phoneNumber, currentUserData['phoneNumber'], 'phoneNumber');
       updateField(street, currentUserData['street'], 'street');
       updateField(houseNumber, currentUserData['houseNumber'], 'houseNumber');
-      updateField(appartamentNumber, currentUserData['appartamentNumber'],
-          'appartamentNumber');
+      updateField(apartamentNumber, currentUserData['apartmentNumber'],
+          'apartmentNumber');
       updateField(city, currentUserData['city'], 'city');
 
       if (pesel != null && pesel.isNotEmpty) {
@@ -68,11 +74,13 @@ class UserReposiitory {
           final encryptedPesel = await _encryptionService.encryptData(pesel);
           updateField(encryptedPesel, currentUserData['pesel'], 'pesel');
         } catch (e) {
-          Exception("Błąd szyfrowania numeru PESEL: ${e.toString()}");
+          throw Exception("Błąd szyfrowania numeru PESEL: ${e.toString()}");
         }
       }
 
-      if (updatedData.isNotEmpty) return;
+      if (updatedData.isEmpty) {
+        return;
+      }
 
       await _firestore.collection('users').doc(userId).update(updatedData);
     } catch (e) {
