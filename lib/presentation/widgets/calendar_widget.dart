@@ -16,12 +16,12 @@ class CalendarWidget extends StatelessWidget {
       startingDayOfWeek: StartingDayOfWeek.monday,
       calendarStyle: CalendarStyle(
         outsideDaysVisible: false,
-        selectedDecoration:
-            BoxDecoration(color: Colors.blue, shape: BoxShape.circle),
-        defaultDecoration:
-            BoxDecoration(color: Colors.grey[200], shape: BoxShape.circle),
-        todayDecoration:
-            BoxDecoration(color: Colors.blue[100], shape: BoxShape.circle),
+        selectedDecoration: BoxDecoration(
+            color: Colors.blue, borderRadius: BorderRadius.circular(8.0)),
+        defaultDecoration: BoxDecoration(
+            color: Colors.grey[200], borderRadius: BorderRadius.circular(8.0)),
+        todayDecoration: BoxDecoration(
+            color: Colors.blue[100], borderRadius: BorderRadius.circular(8.0)),
       ),
       firstDay: DateTime.now(),
       lastDay: DateTime.now().add(Duration(days: 30)),

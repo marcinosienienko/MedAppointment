@@ -14,6 +14,7 @@ class BaseTextField extends StatelessWidget {
   final Function(String)? onChanged;
   final EdgeInsetsGeometry? contentPadding;
   final List<TextInputFormatter>? inputFormatters;
+  final double borderRadius;
 
   const BaseTextField({
     Key? key,
@@ -29,12 +30,14 @@ class BaseTextField extends StatelessWidget {
     this.onChanged,
     this.contentPadding,
     this.inputFormatters,
+    this.borderRadius = 8.0,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
       controller: controller,
+      cursorColor: Colors.blue,
       obscureText: obscureText,
       keyboardType: keyboardType,
       decoration: InputDecoration(
@@ -43,18 +46,19 @@ class BaseTextField extends StatelessWidget {
         prefixIcon: prefixIcon != null ? Icon(prefixIcon) : null,
         suffixIcon: suffixIcon,
         filled: true,
-        fillColor: Colors.white,
+        fillColor: fillColor ?? Colors.blue[50],
         contentPadding: contentPadding ?? const EdgeInsets.all(16.0),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8.0),
+          borderRadius: BorderRadius.circular(borderRadius),
+          borderSide: BorderSide.none,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(borderRadius),
+          borderSide: BorderSide.none,
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8.0),
+          borderRadius: BorderRadius.circular(borderRadius),
           borderSide: BorderSide(color: Colors.blue),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8.0),
-          borderSide: BorderSide(color: Colors.red),
         ),
       ),
       validator: validator,

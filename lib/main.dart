@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:medical_app/data/repositories/auth_repository.dart';
+import 'package:medical_app/data/repositories/user_repository.dart';
 import 'package:medical_app/data/viewmodels/doctor_viewmodel.dart';
 import 'package:medical_app/data/viewmodels/slot_viewmodel.dart';
 import 'package:medical_app/firebase_options.dart';
@@ -20,6 +21,7 @@ import 'package:medical_app/data/viewmodels/appointments_viewmodel.dart';
 import 'package:medical_app/presentation/pages/prescriptions_page.dart';
 import 'package:medical_app/presentation/pages/referrals_page.dart';
 import 'package:medical_app/data/services/secure_encryption_service.dart';
+import 'package:medical_app/data/repositories/user_repository.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -35,22 +37,19 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => SlotViewModel()),
         Provider(create: (context) => AuthRepository()),
-        //ChangeNotifierProxyProvider<SlotViewModel, AppointmentsViewModel>(
-        //  create: (_) => AppointmentsViewModel(null),
-        //  update: (_, slotViewModel, previousAppointmentsViewModel) =>
-        //previousAppointmentsViewModel ??
-        //  AppointmentsViewModel(slotViewModel),
-        //),
-
+        Provider(create: (context) => UserRepository()),
+        ChangeNotifierProvider(create: (_) => SlotViewModel()),
         ChangeNotifierProvider(
             create: (_) => DoctorViewModel()..fetchDoctors()),
         ChangeNotifierProvider(create: (_) => RegisterViewModel()),
         ChangeNotifierProvider(create: (_) => LoginViewModel()),
         ChangeNotifierProvider(
-            create: (context) => AuthViewModel(context.read<AuthRepository>())),
-        ChangeNotifierProvider(create: (_) => UserViewModel()),
+          create: (context) => AuthViewModel(context.read<AuthRepository>()),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => UserViewModel(context.read<UserRepository>()),
+        ),
         ChangeNotifierProvider(create: (_) => AppointmentsViewModel()),
       ],
       child: const MyApp(),
@@ -66,6 +65,11 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Medical Appointments',
       theme: ThemeData(
+        textSelectionTheme: TextSelectionThemeData(
+          cursorColor: AppColors.primary,
+          selectionColor: AppColors.primary.withOpacity(0.5),
+          selectionHandleColor: AppColors.primary,
+        ),
         useMaterial3: true,
         primaryColor: AppColors.primary,
         scaffoldBackgroundColor: AppColors.background,

@@ -6,7 +6,6 @@ import 'package:medical_app/data/repositories/doctor_repository.dart';
 import 'package:medical_app/data/viewmodels/slot_viewmodel.dart';
 import 'package:medical_app/presentation/widgets/confirmation_dialog.dart';
 import 'package:provider/provider.dart';
-import 'package:table_calendar/table_calendar.dart';
 
 class AppointmentsViewModel extends ChangeNotifier {
   final AppointmentRepository _repository = AppointmentRepository();
@@ -43,14 +42,13 @@ class AppointmentsViewModel extends ChangeNotifier {
     try {
       List<Appointment> fetchedAppointments =
           await _repository.getAppointments(userId);
-      final doctorRepo = DoctorRepository(); // Repozytorium lekarzy
+      final doctorRepo = DoctorRepository();
 
       List<Appointment> updatedAppointments = [];
 
       for (var appointment in fetchedAppointments) {
         if (appointment.doctorId == null || appointment.slotId == null) {
-          debugPrint(
-              "⚠️ Brak doctorId lub slotId dla wizyty: ${appointment.id}");
+          debugPrint("Brak doctorId lub slotId dla wizyty: ${appointment.id}");
           updatedAppointments.add(appointment);
           continue;
         }
@@ -59,8 +57,8 @@ class AppointmentsViewModel extends ChangeNotifier {
         final doctor = await doctorRepo.fetchDoctorById(appointment.doctorId!);
         final slot = await doctorRepo.fetchSlotDetails(
             appointment.doctorId!, appointment.slotId!);
-        debugPrint("📡 Pobieranie slotu: ${appointment.slotId}");
-        debugPrint("📡 Slot startTime: ${slot?.startTime}");
+        debugPrint("Pobieranie slotu: ${appointment.slotId}");
+        debugPrint("Slot startTime: ${slot?.startTime}");
 
         final updatedAppointment = appointment.copyWith(
           doctorName: doctor?.name ?? "Nieznany lekarz",
@@ -74,7 +72,7 @@ class AppointmentsViewModel extends ChangeNotifier {
 
       _appointments = updatedAppointments;
     } catch (e) {
-      debugPrint('❌ Błąd podczas pobierania wizyt: $e');
+      debugPrint('Błąd podczas pobierania wizyt: $e');
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -98,13 +96,12 @@ class AppointmentsViewModel extends ChangeNotifier {
           .removeWhere((appointment) => appointment.id == appointmentId);
       notifyListeners();
     } catch (e) {
-      print('❌ Błąd podczas odwoływania wizyty: $e');
+      print('Błąd podczas odwoływania wizyty: $e');
     }
   }
 
   Future<void> handleAppointmentReservation(
       BuildContext context, String userId, SlotViewModel slotViewModel) async {
-    // ✅ Sprawdzenie, czy użytkownik wybrał slot
     if (slotViewModel.selectedSlot == null ||
         !slotViewModel.isSlotAvailable(slotViewModel.selectedSlot!)) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -114,7 +111,6 @@ class AppointmentsViewModel extends ChangeNotifier {
       return;
     }
 
-    // ✅ Sprawdzenie, czy załadowano lekarza
     if (slotViewModel.currentDoctor == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -123,7 +119,6 @@ class AppointmentsViewModel extends ChangeNotifier {
       return;
     }
 
-    // ✅ Sprawdzenie, czy lekarz ma poprawne ID
     if (slotViewModel.currentDoctor!.id.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Błąd: Brak identyfikatora lekarza.')),
@@ -131,7 +126,6 @@ class AppointmentsViewModel extends ChangeNotifier {
       return;
     }
 
-    // ✅ Sprawdzenie, czy slot ma poprawne ID
     if (slotViewModel.selectedSlot!.id.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Błąd: Brak identyfikatora slotu.')),
@@ -139,7 +133,6 @@ class AppointmentsViewModel extends ChangeNotifier {
       return;
     }
 
-    // ✅ Wyświetlenie dialogu z potwierdzeniem
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => ConfirmationDialog(
@@ -159,7 +152,6 @@ class AppointmentsViewModel extends ChangeNotifier {
     }
 
     try {
-      // ✅ Próba rezerwacji wizyty
       final success = await reserveAppointment(
         slotId: slotViewModel.selectedSlot!.id,
         doctorId: slotViewModel.currentDoctor!.id,
@@ -208,18 +200,15 @@ class AppointmentsViewModel extends ChangeNotifier {
     if (confirm != true) return;
 
     try {
-      // ✅ Pobierz instancję `AppointmentsViewModel`
       final appointmentsViewModel =
           Provider.of<AppointmentsViewModel>(context, listen: false);
 
-      // ✅ Anulowanie wizyty w Firestore
       await appointmentsViewModel.cancelAppointment(
         appointmentId: appointment.id,
         doctorId: appointment.doctorId!,
         slotId: appointment.slotId!,
       );
 
-      // ✅ Odświeżenie listy wizyt
       await appointmentsViewModel.fetchAppointments(userId);
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -227,7 +216,7 @@ class AppointmentsViewModel extends ChangeNotifier {
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('❌ Błąd podczas anulowania: ${e.toString()}')),
+        SnackBar(content: Text('Błąd podczas anulowania: ${e.toString()}')),
       );
     }
   }
