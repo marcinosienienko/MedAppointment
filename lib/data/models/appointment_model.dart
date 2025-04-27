@@ -46,11 +46,10 @@ class Appointment {
           ? (data['createdAt'] as Timestamp).toDate()
           : (data['createdAt'] is String
               ? DateTime.tryParse(data['createdAt'] as String)
-              : null), // ✅ Obsługuje zarówno Timestamp, jak i String
+              : null),
     );
   }
 
-  /// ✅ Konwersja obiektu Appointment na JSON (Model → Firestore)
   Map<String, dynamic> toJson() {
     return {
       'date': date,
@@ -59,7 +58,7 @@ class Appointment {
       'slotId': slotId,
       'startTime': startTime,
       'endTime': endTime,
-      'doctorName': doctorName ?? '', // ✅ Obsługuje null
+      'doctorName': doctorName ?? '',
       'patientName': patientName ?? '',
       'specialization': specialization ?? '',
       'status': status,
@@ -67,10 +66,9 @@ class Appointment {
     };
   }
 
-  /// ✅ Tworzenie obiektu z JSON (np. REST API)
   factory Appointment.fromJson(Map<String, dynamic> json) {
     return Appointment(
-      id: json['id'] as String? ?? '', // ✅ Obsługuje null
+      id: json['id'] as String? ?? '',
       date: json['date'] as String?,
       doctorId: json['doctorId'] as String?,
       patientId: json['patientId'] as String?,
@@ -87,7 +85,6 @@ class Appointment {
     );
   }
 
-  /// ✅ Tworzenie kopii obiektu z modyfikacjami (Immutable Copy)
   Appointment copyWith({
     String? id,
     String? date,
