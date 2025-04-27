@@ -6,13 +6,14 @@ class PasswordTextField extends StatefulWidget {
   final TextEditingController? otherController;
   final String hintText;
   final bool isConfirmation;
-
+  final Function(String)? onChanged;
   const PasswordTextField({
     Key? key,
     required this.controller,
     required this.hintText,
     this.otherController,
     this.isConfirmation = false,
+    this.onChanged,
   }) : super(key: key);
 
   @override

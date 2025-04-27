@@ -1,20 +1,93 @@
 import 'package:flutter/material.dart';
-import 'package:medical_app/presentation/widgets/buttons/PrimaryButton.dart';
+import 'package:medical_app/presentation/widgets/buttons/primary_button.dart';
 import 'package:medical_app/presentation/widgets/inputs/email_input.dart';
 import 'package:medical_app/presentation/widgets/inputs/name_input.dart';
 import 'package:medical_app/presentation/widgets/inputs/password_input.dart';
+import 'package:medical_app/presentation/widgets/inputs/phone_number_input.dart';
+import 'package:provider/provider.dart';
+import 'package:medical_app/data/viewmodels/register_page_viewmodel.dart';
 
-class RegisterPage extends StatelessWidget {
+class RegisterPage extends StatefulWidget {
+  @override
+  State<RegisterPage> createState() => _RegisterPageState();
+}
+
+class _RegisterPageState extends State<RegisterPage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
       TextEditingController();
 
+  Future<void> _handleRegister() async {
+    final registerViewModel =
+        Provider.of<RegisterViewModel>(context, listen: false);
+
+    if (_formKey.currentState!.validate()) {
+      final isSuccess = await registerViewModel.registerUser();
+
+      if (!mounted) return;
+
+      if (isSuccess) {
+        registerViewModel.resetForm();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(registerViewModel.successMessage)),
+        );
+        Navigator.pushReplacementNamed(context, '/login');
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(registerViewModel.errorMessage ??
+                registerViewModel.errorRegistration),
+          ),
+        );
+      }
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    final registerViewModel =
+        Provider.of<RegisterViewModel>(context, listen: false);
+    _firstNameController.addListener(() {
+      registerViewModel.setFirstName(_firstNameController.text);
+    });
+    _lastNameController.addListener(() {
+      registerViewModel.setLastName(_lastNameController.text);
+    });
+    _emailController.addListener(() {
+      registerViewModel.setEmail(_emailController.text);
+    });
+    _phoneController.addListener(() {
+      registerViewModel.setPhoneNumber(_phoneController.text);
+    });
+    _passwordController.addListener(() {
+      registerViewModel.setPassword(_passwordController.text);
+    });
+    _confirmPasswordController.addListener(() {
+      registerViewModel.setConfirmPassword(_confirmPasswordController.text);
+    });
+  }
+
+  @override
+  void dispose() {
+    _firstNameController.dispose();
+    _lastNameController.dispose();
+    _emailController.dispose();
+    _phoneController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
+    final registerViewModel = Provider.of<RegisterViewModel>(context);
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: Center(
@@ -42,6 +115,7 @@ class RegisterPage extends StatelessWidget {
                         hintText: 'Imię',
                         prefixIcon: Icons.person,
                         validationType: ValidationType.name,
+                        onChanged: registerViewModel.setFirstName,
                       ),
                       const SizedBox(height: 16),
                       NameInput(
@@ -49,39 +123,47 @@ class RegisterPage extends StatelessWidget {
                         hintText: 'Nazwisko',
                         prefixIcon: Icons.person,
                         validationType: ValidationType.surname,
+                        onChanged: registerViewModel.setLastName,
                       ),
                       const SizedBox(height: 16),
-                      EmailTextField(controller: _emailController),
+                      EmailTextField(
+                        controller: _emailController,
+                        onChanged: registerViewModel.setEmail,
+                      ),
+                      const SizedBox(height: 16),
+                      PhoneNumberInput(
+                        controller: _phoneController,
+                        onChanged: registerViewModel.setPhoneNumber,
+                      ),
                       const SizedBox(height: 16),
                       PasswordTextField(
                         controller: _passwordController,
                         hintText: 'Hasło',
+                        onChanged: registerViewModel.setPassword,
                       ),
                       const SizedBox(height: 16),
                       PasswordTextField(
-                        hintText: 'Potwierdź hasło',
                         controller: _confirmPasswordController,
-                        otherController: _passwordController,
-                        isConfirmation: true,
+                        hintText: 'Potwierdź hasło',
+                        onChanged: registerViewModel.setConfirmPassword,
                       ),
                       const SizedBox(height: 24),
+                      if (registerViewModel.errorMessage != null)
+                        Text(
+                          registerViewModel.errorMessage!,
+                          style: const TextStyle(color: Colors.red),
+                        ),
+                      const SizedBox(height: 8),
                       PrimaryButton(
-                        onPressed: () {
-                          if (_formKey.currentState!.validate()) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Rejestracja...')),
-                            );
-                            // Logika rejestracji
-                          }
-                        },
-                        text: 'Zarejestruj',
+                        onPressed: _handleRegister,
+                        text: registerViewModel.isLoading
+                            ? 'Proszę czekać...'
+                            : 'Zarejestruj',
                       ),
                       const SizedBox(height: 16),
-                      // Odnośnik do logowania
                       TextButton(
                         onPressed: () {
-                          Navigator.pop(
-                              context); // Wróć do poprzedniego ekranu (LoginPage)
+                          Navigator.pop(context);
                         },
                         child: const Text(
                           'Masz już konto? Zaloguj się',

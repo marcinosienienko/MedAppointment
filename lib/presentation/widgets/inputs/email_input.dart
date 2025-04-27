@@ -3,8 +3,13 @@ import 'base_input.dart';
 
 class EmailTextField extends StatelessWidget {
   final TextEditingController? controller;
+  final Function(String)? onChanged;
 
-  const EmailTextField({Key? key, required this.controller}) : super(key: key);
+  const EmailTextField({
+    Key? key,
+    required this.controller,
+    this.onChanged,
+  }) : super(key: key);
 
   String? _emailValidator(String? value) {
     final emailRegex =
